@@ -7,7 +7,7 @@ Created on Mon Dec 21 15:58:24 2020
 @author: Efekn Kokcu
 """
 from numpy import kron
-from PauliOps import X,Y,Z,I,paulis
+from src.PauliOps import X,Y,Z,I,paulis
 
 
 def printlist(tuples):

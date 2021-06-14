@@ -36,7 +36,7 @@ Return:
     res: float
         Trace to be minimized
 """
-
+"""
 def generalInnerProduct(thetas1, k1, thetas2, k2, h, Hcoefs, Htuples):
    
     
@@ -96,7 +96,7 @@ def generalInnerProduct(thetas1, k1, thetas2, k2, h, Hcoefs, Htuples):
                 trace = trace + resV[0][i]*resH[0][j]
     
     return trace
-
+"""
 
 """
 Function of optimize over
@@ -108,15 +108,17 @@ Args:
     Htuples: List of Pauli Tuples for the Hamiltonian
 returns Tr(exp(thetas*k)*v*exp(-thetas*k)*H), which we want to minimize
 """
+"""
 def adjointInnerProduct(thetas, *args):
     k, h, Hcoefs, Htuples = args
     return generalInnerProduct(thetas, k, thetas, k, h, Hcoefs, Htuples)
-
+"""
 
 
 """
 returns gradient of funky. Order of derivatives is the order of the parameters thetas.
     List of partial derivatives for each theta, in the order of the input thetas
+"""
 """
 def gradAdjointInnerProduct(thetas, k, h, Hcoefs, Htuples):
     
@@ -132,7 +134,10 @@ def gradAdjointInnerProduct(thetas, k, h, Hcoefs, Htuples):
         
     
 """
+"""
 Returns h = exp(-thetas*k)*H*exp(thetas*k)
+"""
+
 """
 def gethVecFromk(thetas, k, Hcoefs, Htuples):
     
@@ -159,3 +164,4 @@ def gethVecFromk(thetas, k, Hcoefs, Htuples):
     htuples = multiplylist[0][1]
 
     return hcoefs, htuples
+"""

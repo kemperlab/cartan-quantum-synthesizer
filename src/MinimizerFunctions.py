@@ -13,7 +13,7 @@ import numpy as np
 import numpy.linalg as la
 import math
 
-from PauliOps import commutatePauliString, multiplyLinComb, simplifyLinComb
+from src.PauliOps import commutatePauliString, multiplyLinComb, simplifyLinComb
 
 
 

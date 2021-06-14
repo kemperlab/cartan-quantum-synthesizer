@@ -15,7 +15,7 @@ Usage:
 
 import numpy as np
 
-from CartanMethods import makeGroup, elemcount, evenOdd, getsubalgebraelem
+from src.CartanMethods import makeGroup, elemcount, evenOdd, getsubalgebraelem
 
 
 

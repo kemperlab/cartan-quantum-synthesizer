@@ -49,8 +49,8 @@ import scipy.optimize
 import random as rand
 
 #Import Package Elements
-from MinimizerFunctions import adjointRepNorm
-from HamiltonianAlgebra import generateAlgebra, hamiltonianTuples
+from src.MinimizerFunctions import adjointRepNorm
+from src.HamiltonianAlgebra import generateAlgebra, hamiltonianTuples
 #from EarpPachosInnerProduct import
 #from CartanMethods import makeGroup, findh, getSubalgebra, getSubalgebraElem
 #from PauliOps import SIGN_RULES, X, Y, Z, I, ops, paulis, commutePauliString, multiplyPauliString, MultiplyLinComb, simplifyLinCom

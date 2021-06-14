@@ -9,7 +9,7 @@ A collection of method to calculate Useful Cartan Methods
 @author: Efekan Kokcu
 """
 __docformat__ = "google"
-from PauliOps import commutatePauliString
+from src.PauliOps import commutatePauliString
 
 
 
