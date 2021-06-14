@@ -16,7 +16,7 @@ Please See the [Documentation](docs/) for Information on the Functions included 
 
 To recompile the documentation, run 
 `pdoc -d google -o .\docs .\src` 
-from the main folder (requires pdoc (not pdoc3 or pdocs) 
+from the main folder (requires pdoc--not pdoc3 or pdocs) 
 
 # Current State:
 Not currently functioning. Requires Code from Efekan implementing more complete methods
