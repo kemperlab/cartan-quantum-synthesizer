@@ -1,3 +1,6 @@
+
+# -*- coding: utf-8 -*-
+__docformat__ = 'google'
 """
 Class contains information about the Hamiltonian to be decomposed.
 
@@ -294,3 +297,15 @@ class Hamiltonian:
             return returnlist
         else:
             raise ValueError('Invalid Type: Must be "tuples", "printTuples", "printText", or "text"')
+        
+    def getHamTuples(self):
+        """
+        Strips the coefficients from the list
+
+        Example:
+            [(1,(PauliString)),(2,(PauliString))] -> [(PauliString), (PauliString)]
+        """
+        returnTuples = []
+        for pair in self.hamiltonian:
+            returnTuples.append(pair[1])
+        return returnTuples
