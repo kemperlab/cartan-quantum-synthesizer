@@ -18,5 +18,17 @@ To recompile the documentation, run
 `pdoc -d google -o .\docs .\src` 
 from the main folder (requires pdoc--not pdoc3 or pdocs) 
 
+# General Notes:
+PauliStrings are formatted as one of the following:
+* Text based: AKA 'PauliString' formats the Pauli String σ<sub>x</sub>⦻σ<sub>y</sub>⦻σ<sub>z</sub>⦻σ<sub>I</sub>⦻σ<sub>I</sub> as XYZII
+* Tuple Bases: AKA (PauliString) formats σ<sub>x</sub>⦻σ<sub>y</sub>⦻σ<sub>z</sub>⦻σ<sub>I</sub>⦻σ<sub>I</sub> as (1,2,3,0,0) where each 0,1,2,3 referes the the standard index of the Pauli matricies: 0 -> I, 1 -> X, 2-> Y, 3-> Z
+
 # Current State:
-Not currently functioning. Requires Code from Efekan implementing more complete methods
+Not Functional:
+ * Refactoring the src folder code to an object based version which will be easier to use
+ * Hamiltonian.py finished
+## TODO: 
+ * Cartan.py
+ * FindParameters.py
+ * Documentation for Object based code
+
