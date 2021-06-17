@@ -236,6 +236,8 @@ def FindParameters(modelType, J, sites, closed, fileName=None ,depth = 10, acc =
         replaceKitaev = True
     
     
+
+    
     """ Algebra Generation"""
     #Generates the populated coefficient Hamiltonian in the m algebra basis, finds the hm algebra (h terms followed by m terms)
     #, the k and the h algebras using a function call. See documentation in GenerateHamiltonian.py

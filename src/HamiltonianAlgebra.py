@@ -32,7 +32,7 @@ def generateAlgebra(sites, modelType, J, closed, returnAlg = False, manualMode =
      - KitaevOdd: (YYI + IXX)
      - TransverseIsing: (XX + IZ + ZI)
      - Heisenberg: (XX + YY + ZZ)
-
+    
      Generates the Hamiltonian, a Cartan Decomposition, and the Pauli String algebraic elements
 
 
@@ -99,7 +99,7 @@ def generateAlgebra(sites, modelType, J, closed, returnAlg = False, manualMode =
                     raise Exception("Coupling Mismatch")
             else:
                 newJ[i] = [J[i] for a in toAdd]
-            
+
     g = makeGroup(H)
 
     if "TransverseIsing" in modelType or "Transverse_Z" in modelType:

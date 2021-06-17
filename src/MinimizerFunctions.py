@@ -6,6 +6,7 @@ Methods to minimize in order to find the coefficients in the Cartan Decompositio
 Two Sections:
     AdjointRepNorm: Find the zero of |Ad_k(h) - H |, and optimizes over coefficients for k and h
     AdjointInnerProduct: Find a local minimum of <v, Ad_K(H)>, where v is a dense vector in h
+
 @author: Thomas Steckmann
 @author: Efekan Kokcu
 """
