@@ -52,56 +52,6 @@ I = np.array([[1,0],[0,1]])
 #Allows for indexing the Pauli Arrays (Converting from tuple form (0,1,2,3) to string form IXYZ)
 paulis = [I,X,Y,Z]
 
-
-def set_tuples(k,m,h):
-    """Sets the global tuples up there and generates commutation table, so that we wouldn't have to calculate their commutation again and again.
-
-    """
-    
-    global g_tuples
-    global k_tuples
-    global m_tuples
-    global h_tuples
-    
-    k_tuples = k.copy()
-    h_tuples = h.copy()
-    m_tuples = m.copy()
-    
-    index = 0
-    
-    while index < len(m_tuples):
-        flag = 0
-        for i in range(len(h_tuples)):
-            if m_tuples[index] == h_tuples[i]:
-                flag = 1
-                m_tuples.pop(index)
-                break
-        if flag == 0:
-            index = index + 1
-    
-    g_tuples = k_tuples + h_tuples + m_tuples
-    
-    global comm_table
-    global comm_coefs
-    
-    comm_table = np.zeros((len(g_tuples),len(g_tuples)))
-    comm_coefs = np.zeros((len(g_tuples),len(g_tuples)),dtype=np.complex_)
-    
-    for i in range(len(g_tuples)):
-        for j in range(len(g_tuples)):
-            res = commutatePauliString(1,g_tuples[i],1,g_tuples[j])
-            
-            comm_coefs[i][j] = res[0]
-            
-            if res[0]==0:
-                comm_table[i][j]=0
-            else:
-                for q in range(len(g_tuples)):
-                    if res[1] == g_tuples[q]:
-                        comm_table[i][j] = q
-                        break
-
-
 def commutatePauliString(a,tupleA,b,tupleB):
     """Computes the commutator of two Pauli Strings representated as a tuple
 
@@ -149,13 +99,6 @@ def commutatePauliString(a,tupleA,b,tupleB):
             return c, tupleC
     
     else:
-        '''
-        print('In there\n')
-        print(comm_table)
-        print(comm_coefs)
-        print(tupleA)
-        print(tupleB)
-        '''
         return (a*b*comm_coefs[int(tupleA)][int(tupleB)]), comm_table[int(tupleA)][int(tupleB)] 
     
     
@@ -265,6 +208,35 @@ def commutateLinComb(A,tuplesA,B,tuplesB,accur):
     for i in range(a):
         for j in range(b):
             term = commutatePauliString(A[i],tuplesA[i],B[j],tuplesB[j])
+            flag = 0
+            for k in range(csize):
+                if tuplesC[k]==term[1]:
+                    flag = 1
+                    C[k] = C[k]+term[0]
+            if (flag == 0) & (abs(term[0])>accur):
+                C.append(term[0])
+                tuplesC.append(term[1])
+                csize = csize + 1
+    
+    return C, tuplesC
+
+
+
+def multiplyLinCombRound(A,tuplesA,B,tuplesB, accur):
+    '''
+    Returns multiplication of two linear combinations of Pauli terms, and rounds things that are smaller than accur to zero. 
+    '''
+
+    a = len(A)
+    b = len(B)
+    
+    C = []
+    tuplesC = []
+    csize = 0
+    
+    for i in range(a):
+        for j in range(b):
+            term = multiplyPauliString(A[i],tuplesA[i],B[j],tuplesB[j])
             flag = 0
             for k in range(csize):
                 if tuplesC[k]==term[1]:

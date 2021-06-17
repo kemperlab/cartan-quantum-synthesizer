@@ -22,7 +22,6 @@ from IO import printlist, paulilabel
 class Hamiltonian:
     def __init__(self, sites, name = None):
         """Initializes an emtpy Hamiltnoan, unless name is specified
-
         Args:
             qubits (int): The number of lattice points the Hamiltonisn svyd on
             name (List of Tuples): Easily build Hamiltonians from native models. 
@@ -48,11 +47,12 @@ class Hamiltonian:
                     - hubbard: (XXII + YYII + IIXX + IIYY + ZIZI + IZIZ)
         """
         self.sites = sites
-        self.hamiltonian = []
+        self.HTuples = []
+        self.HCoefs = []
         #Builds the Hamiltonian
         if name is not None:
             for pair in name: 
-                self.addModel(pair)
+                self.addModel(pair) 
 
     def addModel(self, pair):
         """Adds a predefined model to the Hamiltonian object
@@ -84,11 +84,13 @@ class Hamiltonian:
                      raise ValueError("Coefficient List mismatch: Expected {} coefficients".format(len(hamiltonianTerms)))
                 pairedIterable = zip(pair[0],hamiltonianTerms)
                 for (coefficient, pauliString) in pairedIterable:
-                    self.hamiltonian.append((coefficient, pauliString))
+                    self.HTuples.append(pauliString)
+                    self.HCoefs.append(coefficient)
             elif pair[0]:
                 coefficient = pair[0]
                 for pauliString in hamiltonianTerms:
-                    self.hamiltonian.append((pair[0], pauliString))
+                    self.HTuples.append(pauliString)
+                    self.HCoefs.append(coefficient)
         else:
             hamiltonianTerms = self.generateHamiltonian(pair[1]) #pair[1] = modelname, pair[2] = boundary condition
             if isinstance(pair[0], list): #pair[0] = coefficients float or list
@@ -96,30 +98,42 @@ class Hamiltonian:
                      raise ValueError("Coefficient List mismatch: Expected {} coefficients".format(len(hamiltonianTerms)))
                 pairedIterable = zip(pair[0],hamiltonianTerms)
                 for (coefficient, pauliString) in pairedIterable:
-                    self.hamiltonian.append((coefficient, pauliString))
+                    self.HTuples.append(pauliString)
+                    self.HCoefs.append(coefficient)
             elif pair[0]:
                 coefficient = pair[0]
                 for pauliString in hamiltonianTerms:
-                    self.hamiltonian.append((pair[0], pauliString))
+                    self.HTuples.append(pauliString)
+                    self.HCoefs.append(coefficient)
 
     def addTerms(self, pairs):
         """Adds custom elements to build out the Hamiltonian
 
         Args:
-            pair (tuple): Formatted as either
+            pair (List of Tuples or Tuple of Lists or Tuple): Formatted as either
                 * `[(coefficient, PauliString), (coefficient, PauliStringTuple),...]`
                 * `(coefficient, (PauliString))`
+                * `([coefficienList],[(PauliStringList)])
 
         Examples:
             * `Hamiltonian.addTerms((0.45, (1,3,2,0,0,0)))`
             * `Hamiltonian.addTerms([(1,(1,1,0,0)),(2,(2,2,0,0))])
+            * `Hamiltonian.addTerms(([co1, co2, co3, ...],[(PauliString1),(PauliString2),(PauliString3)...])
 
         """
         if isinstance(pairs, list): #Verifies the User input - if a list, iterates over it
             for pair in pairs:
-                self.hamiltonian.append((pair))
+                self.HTuples.append(pair[1])
+                self.HCoefs.append(pair[0])
         elif isinstance(pairs, tuple): #Verifies user input - if a tuple, just adds it
-            self.hamiltonian.append(pairs)
+            if isinstance(pairs[0], list):
+                for i in pairs[0]:
+                    self.HCoefs.append(i)
+                for i in pairs[1]:
+                    self.HTuples.append(i)
+            else:
+                self.HTuples.append(pairs[1])
+                self.HCoefs.append(pairs[0])
 
 
 
@@ -260,52 +274,3 @@ class Hamiltonian:
         else:
             raise Exception("Invalid Model. Valid models include: 'XX', 'YY', 'ZZ', 'XY', 'KitaevEven', 'KitaevOdd', 'Heisenberg', TransverseIsing', and 'Transverse_Z'")
         return hamiltonian
-
-
-    def getHamiltonian(self, type='tuples'):
-        """ Based on the type, returns the Hamiltonian from the object and formats it.
-
-        Args:
-            type (String, default = 'tuples'): Specifies the return type of the function.
-
-                Valid inputs:
-                 * `'tuples'`: Return formatted as [(coefficient, (PauliString), ... ]
-                 * `'printTuples'`: Prints out to the console (coefficient, (PauliString)) \n ...
-                 * `'printText'`:` Prints out 'coefficient * 'PauliString' + ....
-                 * `'text'`: Return formatted as a list of [[coefficient, 'PauliString']]
-        
-        Returns:
-            For type=`'tuples'` or type=`'text'`, returns
-            * `'tuples'`: A list of Coefficient, (PauliString) Tuple pairs
-            * `'text'`: A List of Coefficient 'PauliString' List pairs
-        
-        Raises:
-            ValueError: Invalid type
-        """
-        if type == 'tuples':
-            return self.hamiltonian
-        elif type == 'printTuples':
-            for pair in self.hamiltonian:
-                print(str(pair[0]) + ', ' + str(pair[1])) #Prints coefficient(pauliString)
-        elif type == 'printText':
-            for pair in self.hamiltonian:
-                print(str(pair[0]) + " * " + str(paulilabel(pair[1]))) #Prints coefficient'pauliString'
-        elif type == 'text':
-            returnlist = []
-            for pair in self.hamiltonian:
-                returnlist.append([pair[0],  str(paulilabel(pair[1]))]) #Prints coefficient'pauliString'
-            return returnlist
-        else:
-            raise ValueError('Invalid Type: Must be "tuples", "printTuples", "printText", or "text"')
-        
-    def getHamTuples(self):
-        """
-        Strips the coefficients from the list
-
-        Example:
-            [(1,(PauliString)),(2,(PauliString))] -> [(PauliString), (PauliString)]
-        """
-        returnTuples = []
-        for pair in self.hamiltonian:
-            returnTuples.append(pair[1])
-        return returnTuples

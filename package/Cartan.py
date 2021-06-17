@@ -4,6 +4,9 @@ __docformat__ = 'google'
 # Object containing the functions and data required to generate a Cartan Decomposition from a given Hamiltonian. 
 from object_based.PauliOps import commutatePauliString
 
+TODO:
+* Add in k simplification functions
+
 Authors:
 * Thomas Steckmann
 * Efekan Kokcu
@@ -36,26 +39,26 @@ class Cartan:
                 * `'count' + 'X', 'Y', or 'Z'`: Counts of the number of the specified Pauli Tuple. Even count in m, odd in k
         """
         self.hamiltonian = hamObj
-        self.hamTuples = self.hamiltonian.getHamTuples()
+        self.HTuples = self.hamiltonian.HTuples
         self.g = self.makeGroup()
-        self.setInvoluiton(involution)
-        self.getsubalgebra()
+        self.decompose(involution)
+        self.subalgebra() #sets self.k and self.m
 
-    def setInvoluiton(self, involutionName):
+    def decompose(self, involutionName):
         """
         Sets a new Involution using a switch
         """
         self.involution = involutionName #Store involution name
 
         if involutionName == 'evenOdd': 
-            (self.m, self.k) = self.evenOdd(self.hamAlg)
+            (self.m, self.k) = self.evenOdd(self.g)
         elif involutionName == 'knejaGlaser':
-                 (self.m, self.k) = self.knejaGlaserDecomp(self.hamAlg)
+            (self.m, self.k) = self.knejaGlaser(self.g)
         elif involutionName == 'countX':
-                 (self.m, self.k) = self.elemcount(self.hamAlg, 1)
+            (self.m, self.k) = self.elemcount(self.g, 1)
         elif involutionName == 'countY':
-                 (self.m, self.k) = self.elemcount(self.hamAlg, 2)
-        elif involutionName == 'countZ': (self.m, self.k) = self.elemcount(self.hamAlg)
+            (self.m, self.k) = self.elemcount(self.g, 2)
+        elif involutionName == 'countZ': (self.m, self.k) = self.elemcount(self.g)
 
 
     def makeGroup(self):
@@ -186,7 +189,7 @@ class Cartan:
         return m,k
 
     
-    def getsubalgebra(self):
+    def subalgebra(self):
         '''
         Generates h with the order of the elements in m. Seeds from the first elements in m
         '''
@@ -203,7 +206,7 @@ class Cartan:
                 
         self.h = h
     
-    def getSeededSubAlgebra(self,seedList):
+    def seededSubAlgebra(self,seedList):
         """ Generates h from a list of Commuting elements in the seedList 
         
         Args:
