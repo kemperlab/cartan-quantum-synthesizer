@@ -9,13 +9,14 @@ Authors:
 * Efekan Kokcu
 """
 
-
+#General
 import time
 import scipy.optimize
 import numpy as np
 import csv
 import os
 import math
+#Local Package
 import package.util.IO as IO
 
 #Commutator tables

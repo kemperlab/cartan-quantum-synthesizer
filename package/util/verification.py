@@ -1,6 +1,7 @@
 #import sys
 #sys.path.append('c:\\Users\\Thoma\\OneDrive\\Documents\\2021_ORNL\\CartanCodeGit\\cartan-quantum-synthesizer')
-
+# -*- coding: utf-8 -*-
+__docformat__ = 'google'
 """
 A collection of functions useful for exact diagonalization and converting KHK decomposition to a matrix
 """

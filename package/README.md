@@ -16,7 +16,7 @@ Please see the [Documentation](docs/) for Information on the Functions included 
 
 To recompile the documentation, run 
 `pdoc -d google -o .\docs .\package` 
-from the main folder (requires pdoc) 
+from the root folder (requires pdoc) 
 
 # General Notes:
 PauliStrings are formatted as one of the following:

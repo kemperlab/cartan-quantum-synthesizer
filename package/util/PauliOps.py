@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+__docformat__ = 'google'
 """
 Created on Mon Dec 21 15:16:56 2020
 A Collection of Methods to calculate useful operations on Pauli Strings. Mostly commutators

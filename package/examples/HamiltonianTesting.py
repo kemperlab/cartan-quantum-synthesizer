@@ -1,8 +1,9 @@
-import sys
+# -*- coding: utf-8 -*-
+__docformat__ = 'google'
+'''import sys
 sys.path.append('c:\\Users\\Thoma\\OneDrive\\Documents\\2021_ORNL\\CartanCodeGit\\cartan-quantum-synthesizer')
-print(sys.path)
-import package.src
-from package.src.Hamiltonian import Hamiltonian
+print(sys.path)'''
+from package.methods.Hamiltonian import Hamiltonian
 
 print('generic XY')
 xymodel = Hamiltonian(4, name=[(1, 'xy')])
