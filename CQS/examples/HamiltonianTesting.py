@@ -3,7 +3,7 @@ __docformat__ = 'google'
 '''import sys
 sys.path.append('c:\\Users\\Thoma\\OneDrive\\Documents\\2021_ORNL\\CartanCodeGit\\cartan-quantum-synthesizer')
 print(sys.path)'''
-from package.methods.Hamiltonian import Hamiltonian
+from methods import Hamiltonian
 
 print('generic XY')
 xymodel = Hamiltonian(4, name=[(1, 'xy')])

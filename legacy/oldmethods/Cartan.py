@@ -1,22 +1,24 @@
 # -*- coding: utf-8 -*-
 __docformat__ = 'google'
 """
-# Object containing the functions and data required to generate a Cartan Decomposition from a given Hamiltonian. 
-from object_based.PauliOps import commutatePauliString
 
-TODO:
-* Add in k simplification functions
-
-Authors:
-* Thomas Steckmann
-* Efekan Kokcu
 """
 
-from package.util.PauliOps import commutatePauliString
+from util.PauliOps import commutatePauliString
 
 class Cartan:
     """
     Class to contain the options for performing Cartan Decomposition on a Hamiltonian
+        
+    # Object containing the functions and data required to generate a Cartan Decomposition from a given Hamiltonian. 
+    from object_based.PauliOps import commutatePauliString
+
+    TODO:
+    * Add in k simplification functions
+
+    Authors:
+    * Thomas Steckmann
+    * Efekan Kokcu
 
     Functionality:
     * Generate Hamiltonian Algebra

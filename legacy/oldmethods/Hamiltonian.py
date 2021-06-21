@@ -1,25 +1,26 @@
 
 # -*- coding: utf-8 -*-
 __docformat__ = 'google'
-"""
-Class contains information about the Hamiltonian to be decomposed.
 
-## Functionality:
-* Build Hamiltonians from prebuilt Spin models
-* Add custom Hamiltonians 
-
-TODO:
- * Add Hubbard Model
-
-Authors:
-* Thomas Steckmann
-* Efekan Kokcu
-"""
-from package.util.IO import printlist, paulilabel
+from util.IO import printlist, paulilabel
 
 #from ..package.IO import printlist, paulilabel
 
 class Hamiltonian:
+    """
+    Class contains information about the Hamiltonian to be decomposed.
+
+    ## Functionality:
+    * Build Hamiltonians from prebuilt Spin models
+    * Add custom Hamiltonians 
+
+    TODO:
+    * Add Hubbard Model
+
+    Authors:
+    * Thomas Steckmann
+    * Efekan Kokcu
+    """
     def __init__(self, sites, name = None):
         """Initializes an emtpy Hamiltnoan, unless name is specified
         Args:

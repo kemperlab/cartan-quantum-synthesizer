@@ -1,0 +1,11 @@
+Metadata-Version: 1.2
+Name: CQS
+Version: 0.1
+Summary: Implementation of the Cartan Decomposition for generating time evolution circuits on lattice spin models
+Home-page: https://github.com/kemperlab/cartan-quantum-synthesizer
+Author: Thomas Steckmann, Efekan Kokcu
+Author-email: tmsteckm@ncsu.edu, ekokcu@ncsu.edu
+License: MIT
+Project-URL: Documtation, https://kemperlab.github.io/cartan-quantum-synthesizer/
+Description: UNKNOWN
+Platform: UNKNOWN

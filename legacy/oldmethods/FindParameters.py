@@ -1,13 +1,6 @@
 # -*- coding: utf-8 -*-
 __docformat__ = 'google'
-""" From a Cartan Decomposition, runs the optimizer to find the appropriate parameters for a circuit
 
-Warning: Very long runtime for more than 8ish qubits
-
-Authors:
-* Thomas Steckmann
-* Efekan Kokcu
-"""
 
 #General
 import time
@@ -17,18 +10,19 @@ import csv
 import os
 import math
 #Local Package
-import package.util.IO as IO
+import util.IO as IO
 
-#Commutator tables
-RULES = [1,3,1,3]
-SIGN_RULES = [[1,1,1,1], 
-             [1, 1, 1j, -1j],
-             [1, -1j, 1, 1j],
-             [1, 1j, -1j, 1]]
+
 
 class FindParameters:
     """
-    Class to find, manage, and store information about the parameters needed in the decomposition
+    From a Cartan Decomposition, runs the optimizer to find the appropriate parameters for a circuit
+
+    Warning: Very long runtime for more than 8ish qubits
+
+    Authors:
+    * Thomas Steckmann
+    * Efekan Kokcu
     """
     def __init__(self, cartan, saveFileName = None, loadfileName=None, optimizerMethod='BFGS', accuracy=1e-5, initialGuess=None, steps = 5000):
         """

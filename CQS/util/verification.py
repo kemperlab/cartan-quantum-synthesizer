@@ -9,7 +9,8 @@ A collection of functions useful for exact diagonalization and converting KHK de
 import numpy as np
 from numpy import kron
 from scipy.linalg import expm, norm
-import package.util.IO as IO
+
+import util.IO as IO
 
 #The Pauli Matricies in matrix form
 X = np.array([[0,1],[1,0]])

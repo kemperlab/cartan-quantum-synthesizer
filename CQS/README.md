@@ -12,11 +12,11 @@ The functionality is based on three object classes:
 For example, to use these objects to generate the decomposition for the time evolution of the four site 1D lattice XY model, the code would be as follows:
 
 ## Import Key elements of the package:
-`from package.src.Hamiltonian import Hamiltonian`
+`from CQS.src.Hamiltonian import Hamiltonian`
 
-`from package.src.Cartan import Cartan`
+`from CQS.src.Cartan import Cartan`
 
-`from package.src.FindParameters import FindParameters`
+`from CQS.src.FindParameters import FindParameters`
 
 
 ## Define the parameters of the model:

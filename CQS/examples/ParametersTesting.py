@@ -3,12 +3,11 @@ __docformat__ = 'google'
 '''import sys
 sys.path.append('c:\\Users\\Thoma\\OneDrive\\Documents\\2021_ORNL\\CartanCodeGit\\cartan-quantum-synthesizer')
 #print(sys.path)'''
-from package.methods.Hamiltonian import Hamiltonian
-from package.methods.Cartan import Cartan
-from package.methods.FindParameters import FindParameters
+from methods import Hamiltonian, Cartan, FindParameters
+
 import numpy as np
-from package.util.IO import tuplesToMatrix
-from package.util.verification import Trotter, exactU, PauliExpUnitary, KHK
+from util.IO import tuplesToMatrix
+from util.verification import Trotter, exactU, PauliExpUnitary, KHK
 
 sites = 6
 model = [(1,'tfim', False)]
