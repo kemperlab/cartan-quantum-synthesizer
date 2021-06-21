@@ -37,6 +37,9 @@
                     <a class="variable" href="#RULES">RULES</a>
             </li>
             <li>
+                    <a class="variable" href="#SIGN_RULES">SIGN_RULES</a>
+            </li>
+            <li>
                     <a class="function" href="#commutatePauliString">commutatePauliString</a>
             </li>
             <li>
@@ -76,7 +79,7 @@
 <a href="./../../package.html">package</a><wbr>.<a href="./../util.html">util</a><wbr>.PauliOps    </h1>
 
                         <div class="docstring"><p>Created on Mon Dec 21 15:16:56 2020
-A Collection of Methods to calcualte useful operations on Pauli Strings</p>
+A Collection of Methods to calculate useful operations on Pauli Strings. Mostly commutators</p>
 
 <p>@author: Thomas Steckmann
 @author: Efekan Kokcu</p>
@@ -87,7 +90,7 @@ A Collection of Methods to calcualte useful operations on Pauli Strings</p>
             <div class="codehilite"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Created on Mon Dec 21 15:16:56 2020</span>
-<span class="sd">A Collection of Methods to calcualte useful operations on Pauli Strings</span>
+<span class="sd">A Collection of Methods to calculate useful operations on Pauli Strings. Mostly commutators</span>
 
 <span class="sd">@author: Thomas Steckmann</span>
 <span class="sd">@author: Efekan Kokcu</span>
@@ -98,7 +101,11 @@ A Collection of Methods to calcualte useful operations on Pauli Strings</p>
 
 
 <span class="n">ops</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;I&#39;</span><span class="p">,</span><span class="s1">&#39;X&#39;</span><span class="p">,</span><span class="s1">&#39;Y&#39;</span><span class="p">,</span><span class="s1">&#39;Z&#39;</span><span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;Indices for converting from (PauliString) --&gt; String format&quot;&quot;&quot;</span>
+<span class="n">RULES</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Used for generating the Commutator tables and pauli commutators (efficiently we think)</span>
+<span class="sd">``</span>
 <span class="sd">RULES:</span>
 <span class="sd">    Used to find the multiplication between two paulis represented as indices in a tuple (I == 0, X == 1, Y == 2, Z == 3)</span>
 <span class="sd">The operation is (index1 + index2*RULES[index1] % 4) = Pauli Matrix result as an index</span>
@@ -110,10 +117,16 @@ A Collection of Methods to calcualte useful operations on Pauli Strings</p>
 <span class="sd">                                         (1 + 2*3) % 4 = 7 % 4 = 3 for Y</span>
 <span class="sd">                                         (1 + 3*3) % 4 = 10 % 4 = 2 for Z as index2</span>
 <span class="sd">These can easily be expanded for Y and Z</span>
+<span class="sd">``</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="n">RULES</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
-<span class="c1">#In version 3, these terms are corrected</span>
+
+<span class="n">SIGN_RULES</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> 
+             <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="p">],</span>
+             <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="n">j</span><span class="p">],</span>
+             <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Rules for computing the sign of two commutators</span>
+<span class="sd">```</span>
 <span class="sd">SIGN_RULES: </span>
 <span class="sd">    Gives the multiplication sign rules for multiplying Pauli Matricies (ex. X*Y -&gt; iZ)</span>
 <span class="sd">    </span>
@@ -124,22 +137,21 @@ A Collection of Methods to calcualte useful operations on Pauli Strings</p>
 <span class="sd">Z +  +i -i +</span>
 
 <span class="sd">Order: row * column</span>
+<span class="sd">```</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="n">SIGN_RULES</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> 
-             <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="p">],</span>
-             <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="n">j</span><span class="p">],</span>
-             <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
 
 <span class="c1">#The Pauli Matricies in matrix form</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
 <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="p">],[</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
 <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
 <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
-<span class="c1">#Allows for indexing the Pauli Arrays (Converting from tuple form (0,1,2,3) to string form IXYZ)</span>
 <span class="n">paulis</span> <span class="o">=</span> <span class="p">[</span><span class="n">I</span><span class="p">,</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">Z</span><span class="p">]</span>
+<span class="c1">#Allows for indexing the Pauli Arrays (Converting from tuple form (0,1,2,3) to string form IXYZ)</span>
 
 <span class="k">def</span> <span class="nf">commutatePauliString</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">tupleA</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">tupleB</span><span class="p">,</span> <span class="n">comm_coefs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">comm_table</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Computes the commutator of two Pauli Strings representated as a tuple</span>
+<span class="sd">    </span>
+<span class="sd">    If a commutator table is passed, the operation is much more efficient</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        a (np.complex128): </span>
@@ -150,6 +162,7 @@ A Collection of Methods to calcualte useful operations on Pauli Strings</p>
 <span class="sd">            The coefficient of the second Pauli String term</span>
 <span class="sd">        tupleB (tuple, int): </span>
 <span class="sd">            tuple represenation of the second Pauli String, or the index in the commutator table</span>
+<span class="sd">        </span>
 <span class="sd">    </span>
 <span class="sd">    Returns:</span>
 <span class="sd">        c (np.complex128):</span>
@@ -379,7 +392,21 @@ A Collection of Methods to calcualte useful operations on Pauli Strings</p>
         <span class="name">ops</span><span class="default_value"> = [&#39;I&#39;, &#39;X&#39;, &#39;Y&#39;, &#39;Z&#39;]</span>
     </div>
 
-            <div class="docstring"><h6 id="rules">RULES</h6>
+            <div class="docstring"><p>Indices for converting from (PauliString) --> String format</p>
+</div>
+
+
+                </section>
+                <section id="RULES">
+                                <div class="attr variable"><a class="headerlink" href="#RULES">#&nbsp;&nbsp</a>
+
+        <span class="name">RULES</span><span class="default_value"> = [1, 3, 1, 3]</span>
+    </div>
+
+            <div class="docstring"><p>Used for generating the Commutator tables and pauli commutators (efficiently we think)
+``</p>
+
+<h6 id="rules">RULES</h6>
 
 <blockquote>
   <p>Used to find the multiplication between two paulis represented as indices in a tuple (I == 0, X == 1, Y == 2, Z == 3)</p>
@@ -393,27 +420,31 @@ X * anythong: (1 + (Index2)</em>3 % 4) gives
                                          (1 + 1<em>3) % 4 = 0 for X
                                          (1 + 2</em>3) % 4 = 7 % 4 = 3 for Y
                                          (1 + 3*3) % 4 = 10 % 4 = 2 for Z as index2
-These can easily be expanded for Y and Z</p>
+These can easily be expanded for Y and Z
+``</p>
 </div>
 
 
                 </section>
-                <section id="RULES">
-                                <div class="attr variable"><a class="headerlink" href="#RULES">#&nbsp;&nbsp</a>
+                <section id="SIGN_RULES">
+                                <div class="attr variable"><a class="headerlink" href="#SIGN_RULES">#&nbsp;&nbsp</a>
 
-        <span class="name">RULES</span><span class="default_value"> = [1, 3, 1, 3]</span>
+        <span class="name">SIGN_RULES</span><span class="default_value"> = [[1, 1, 1, 1], [1, 1, 1j, (-0-1j)], [1, (-0-1j), 1, 1j], [1, 1j, (-0-1j), 1]]</span>
     </div>
 
-            <div class="docstring"><p>SIGN_RULES: 
-    Gives the multiplication sign rules for multiplying Pauli Matricies (ex. X*Y -> iZ)</p>
+            <div class="docstring"><p>Rules for computing the sign of two commutators</p>
 
-<p>I  X  Y  Z
+<pre><code>SIGN_RULES: 
+    Gives the multiplication sign rules for multiplying Pauli Matricies (ex. X*Y -&gt; iZ)
+
+  I  X  Y  Z
 I +  +  +  +
 X +  +  +i -i
 Y +  -i +  +i
-Z +  +i -i +</p>
+Z +  +i -i +
 
-<p>Order: row * column</p>
+Order: row * column
+</code></pre>
 </div>
 
 
@@ -430,6 +461,8 @@ Z +  +i -i +</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">commutatePauliString</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">tupleA</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">tupleB</span><span class="p">,</span> <span class="n">comm_coefs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">comm_table</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Computes the commutator of two Pauli Strings representated as a tuple</span>
+<span class="sd">    </span>
+<span class="sd">    If a commutator table is passed, the operation is much more efficient</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        a (np.complex128): </span>
@@ -440,6 +473,7 @@ Z +  +i -i +</p>
 <span class="sd">            The coefficient of the second Pauli String term</span>
 <span class="sd">        tupleB (tuple, int): </span>
 <span class="sd">            tuple represenation of the second Pauli String, or the index in the commutator table</span>
+<span class="sd">        </span>
 <span class="sd">    </span>
 <span class="sd">    Returns:</span>
 <span class="sd">        c (np.complex128):</span>
@@ -481,6 +515,8 @@ Z +  +i -i +</p>
         </details>
 
             <div class="docstring"><p>Computes the commutator of two Pauli Strings representated as a tuple</p>
+
+<p>If a commutator table is passed, the operation is much more efficient</p>
 
 <h6 id="args">Args</h6>
 
