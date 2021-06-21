@@ -47,7 +47,7 @@ class FindParameters:
                 
                 Options: 
                     * `'BFGS'` : Uses Gradient
-                    * '`Powel'`: Does not use Gradient
+                    * `'Powel'`: Does not use Gradient
             accuracy (float, default=1e-5): Optimizer convergence Criteria
             initialGuess (List of values): Allows the user to specify the inital guess for k. Must be correct, no input checking is currently implemented
             steps (int): The maximum number of optimization steps before termination
@@ -146,6 +146,7 @@ class FindParameters:
     
     
     def generateIndexLists(self):
+        """Generates a lists for H, h, and k using indices in g instead of as lists of Tuples"""
 
         #Computes the indices of each of the k elements in the g list                   
         self.kElementIndices = []
@@ -175,6 +176,14 @@ class FindParameters:
 
     
     def optimize(self):
+        """
+        Chooses between methods of optimization. Current options are 'BFGS' and 'Powell' from scipy.optimize
+
+        Sets the attribute kCoefs, which are the results of the optimizer
+
+        Returns: 
+            The object returned by the Scipy Optimizer. Contains information about the minimum, parameters, and a few other things
+        """
         initialGuess = self.initialGuess
         if self.optimizerMethod == 'BFGS':
             optimiumReturn = scipy.optimize.minimize(self.CostFunction,initialGuess, method='BFGS', jac = self.gradCostFunction,options={'disp':True, 'gtol':self.accuracy, 'maxiter':self.steps})
@@ -303,6 +312,10 @@ class FindParameters:
     def sethVecFromk(self):
         '''
         Returns h = exp(-thetas•k)•H•exp(thetas•k)
+
+        Defines hErrorTuples and hErrorCoefs, which are the exact result of the adjoint representation. The result is in m, not in h, though it is mostly in h. 
+
+        hCoefs and hTuples are the results stripped of the components in m
         '''
 
         I = (0,)*len(self.cartan.k[0])
