@@ -277,6 +277,14 @@
 
     
     <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Chooses between methods of optimization. Current options are &#39;BFGS&#39; and &#39;Powell&#39; from scipy.optimize</span>
+
+<span class="sd">        Sets the attribute kCoefs, which are the results of the optimizer</span>
+
+<span class="sd">        Returns: </span>
+<span class="sd">            The object returned by the Scipy Optimizer. Contains information about the minimum, parameters, and a few other things</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">initialGuess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialGuess</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizerMethod</span> <span class="o">==</span> <span class="s1">&#39;BFGS&#39;</span><span class="p">:</span>
             <span class="n">optimiumReturn</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CostFunction</span><span class="p">,</span><span class="n">initialGuess</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;BFGS&#39;</span><span class="p">,</span> <span class="n">jac</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradCostFunction</span><span class="p">,</span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;disp&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;gtol&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">accuracy</span><span class="p">,</span> <span class="s1">&#39;maxiter&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">})</span>
@@ -405,6 +413,10 @@
     <span class="k">def</span> <span class="nf">sethVecFromk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns h = exp(-thetas•k)•H•exp(thetas•k)</span>
+
+<span class="sd">        Defines hErrorTuples and hErrorCoefs, which are the exact result of the adjoint representation. The result is in m, not in h, though it is mostly in h. </span>
+
+<span class="sd">        hCoefs and hTuples are the results stripped of the components in m</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">I</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -776,6 +788,14 @@
 
     
     <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Chooses between methods of optimization. Current options are &#39;BFGS&#39; and &#39;Powell&#39; from scipy.optimize</span>
+
+<span class="sd">        Sets the attribute kCoefs, which are the results of the optimizer</span>
+
+<span class="sd">        Returns: </span>
+<span class="sd">            The object returned by the Scipy Optimizer. Contains information about the minimum, parameters, and a few other things</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">initialGuess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialGuess</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizerMethod</span> <span class="o">==</span> <span class="s1">&#39;BFGS&#39;</span><span class="p">:</span>
             <span class="n">optimiumReturn</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CostFunction</span><span class="p">,</span><span class="n">initialGuess</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;BFGS&#39;</span><span class="p">,</span> <span class="n">jac</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradCostFunction</span><span class="p">,</span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;disp&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;gtol&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">accuracy</span><span class="p">,</span> <span class="s1">&#39;maxiter&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">})</span>
@@ -904,6 +924,10 @@
     <span class="k">def</span> <span class="nf">sethVecFromk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns h = exp(-thetas•k)•H•exp(thetas•k)</span>
+
+<span class="sd">        Defines hErrorTuples and hErrorCoefs, which are the exact result of the adjoint representation. The result is in m, not in h, though it is mostly in h. </span>
+
+<span class="sd">        hCoefs and hTuples are the results stripped of the components in m</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">I</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -1231,7 +1255,7 @@ If loadFileName is provided, does not run the optimizer and instead reads data f
 
 <ul>
 <li><code>'BFGS'</code> : Uses Gradient</li>
-<li>'<code>Powel'</code>: Does not use Gradient</li>
+<li><code>'Powel'</code>: Does not use Gradient</li>
 </ul></li>
 <li><strong>accuracy (float, default=1e-5):</strong>  Optimizer convergence Criteria</li>
 <li><strong>initialGuess (List of values):</strong>  Allows the user to specify the inital guess for k. Must be correct, no input checking is currently implemented</li>
@@ -1353,7 +1377,9 @@ If loadFileName is provided, does not run the optimizer and instead reads data f
 
         </details>
 
-    
+            <div class="docstring"><p>Generates a lists for H, h, and k using indices in g instead of as lists of Tuples</p>
+</div>
+
 
                             </div>
                             <div id="FindParameters.optimize" class="classattr">
@@ -1366,52 +1392,15 @@ If loadFileName is provided, does not run the optimizer and instead reads data f
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">generateIndexLists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Generates a lists for H, h, and k using indices in g instead of as lists of Tuples&quot;&quot;&quot;</span>
-
-        <span class="c1">#Computes the indices of each of the k elements in the g list                   </span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">kElementIndices</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">k</span><span class="p">)):</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">g</span><span class="p">)):</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">k</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">g</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">kElementIndices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
-                    <span class="k">break</span>  
-
-        <span class="c1">#computes the indicies of each of the Ham elements in the g list</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">HElementIndices</span> <span class="o">=</span> <span class="p">[]</span> 
-        <span class="n">Htuples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hamiltonian</span><span class="o">.</span><span class="n">HTuples</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Htuples</span><span class="p">)):</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">g</span><span class="p">)):</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">g</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">==</span><span class="n">Htuples</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">HElementIndices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
-                    <span class="k">break</span>
-        
-        <span class="c1">#Computes the indices of the of the h elements in the g list:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hElementIndices</span> <span class="o">=</span> <span class="p">[]</span> 
-        <span class="n">htuples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">h</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">htuples</span><span class="p">)):</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">g</span><span class="p">)):</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">g</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">==</span><span class="n">htuples</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">hElementIndices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
-                    <span class="k">break</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
-                            <div id="FindParameters.generalCostFunction" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#FindParameters.generalCostFunction">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">generalCostFunction</span><span class="signature">(self, thetas1, thetas2, index)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Chooses between methods of optimization. Current options are &#39;BFGS&#39; and &#39;Powell&#39; from scipy.optimize</span>
+
+<span class="sd">        Sets the attribute kCoefs, which are the results of the optimizer</span>
+
+<span class="sd">        Returns: </span>
+<span class="sd">            The object returned by the Scipy Optimizer. Contains information about the minimum, parameters, and a few other things</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">initialGuess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialGuess</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizerMethod</span> <span class="o">==</span> <span class="s1">&#39;BFGS&#39;</span><span class="p">:</span>
             <span class="n">optimiumReturn</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CostFunction</span><span class="p">,</span><span class="n">initialGuess</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;BFGS&#39;</span><span class="p">,</span> <span class="n">jac</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradCostFunction</span><span class="p">,</span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;disp&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;gtol&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">accuracy</span><span class="p">,</span> <span class="s1">&#39;maxiter&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">})</span>
@@ -1423,35 +1412,22 @@ If loadFileName is provided, does not run the optimizer and instead reads data f
 
         </details>
 
-            <div class="docstring"><p>This returns Tr(e<sup>i•thetas1•k1</sup>•v•e<sup>-thetas2•k2</sup>•H)
-(To make it clear, for Earp and Pachos function, we have k1=k2=k, thetas1=thetas2=thetas)</p>
+            <div class="docstring"><p>Chooses between methods of optimization. Current options are 'BFGS' and 'Powell' from scipy.optimize</p>
 
-<h6 id="args">Args</h6>
+<p>Sets the attribute kCoefs, which are the results of the optimizer</p>
 
-<ul>
-<li><strong>thetas1 (List):</strong>  The coefficients for the k_tuples on the left side</li>
-<li><strong>thetas2 (List):</strong>  The coefficients for the K_tuples on the right side</li>
-<li><strong>index (int):</strong>  The number of k elements acting on v</li>
-</ul>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <p>Tr(e<sup>i•thetas1•k1</sup>)•v•e<sup>-thetas2•k2</sup>•H)</p>
-</blockquote>
-
-<p>TODO: 
-    * Comment the steps in this section</p>
+<p>Returns: 
+    The object returned by the Scipy Optimizer. Contains information about the minimum, parameters, and a few other things</p>
 </div>
 
 
                             </div>
-                            <div id="FindParameters.CostFunction" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#FindParameters.CostFunction">#&nbsp;&nbsp</a>
+                            <div id="FindParameters.generalCostFunction" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#FindParameters.generalCostFunction">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">CostFunction</span><span class="signature">(self, thetas)</span>:
+            <span class="name">generalCostFunction</span><span class="signature">(self, thetas1, thetas2, index)</span>:
     </div>
 
                 <details>
@@ -1510,17 +1486,35 @@ If loadFileName is provided, does not run the optimizer and instead reads data f
 
         </details>
 
-            <div class="docstring"><p>returns Tr(exp(thetas•k)•v•exp(-thetas•k)•H)</p>
+            <div class="docstring"><p>This returns Tr(e<sup>i•thetas1•k1</sup>•v•e<sup>-thetas2•k2</sup>•H)
+(To make it clear, for Earp and Pachos function, we have k1=k2=k, thetas1=thetas2=thetas)</p>
+
+<h6 id="args">Args</h6>
+
+<ul>
+<li><strong>thetas1 (List):</strong>  The coefficients for the k_tuples on the left side</li>
+<li><strong>thetas2 (List):</strong>  The coefficients for the K_tuples on the right side</li>
+<li><strong>index (int):</strong>  The number of k elements acting on v</li>
+</ul>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <p>Tr(e<sup>i•thetas1•k1</sup>)•v•e<sup>-thetas2•k2</sup>•H)</p>
+</blockquote>
+
+<p>TODO: 
+    * Comment the steps in this section</p>
 </div>
 
 
                             </div>
-                            <div id="FindParameters.gradCostFunction" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#FindParameters.gradCostFunction">#&nbsp;&nbsp</a>
+                            <div id="FindParameters.CostFunction" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#FindParameters.CostFunction">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">gradCostFunction</span><span class="signature">(self, thetas)</span>:
+            <span class="name">CostFunction</span><span class="signature">(self, thetas)</span>:
     </div>
 
                 <details>
@@ -1538,17 +1532,17 @@ If loadFileName is provided, does not run the optimizer and instead reads data f
 
         </details>
 
-            <div class="docstring"><p>returns gradient of funky. Order of derivatives is the order of the parameters thetas.</p>
+            <div class="docstring"><p>returns Tr(exp(thetas•k)•v•exp(-thetas•k)•H)</p>
 </div>
 
 
                             </div>
-                            <div id="FindParameters.adj_action" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#FindParameters.adj_action">#&nbsp;&nbsp</a>
+                            <div id="FindParameters.gradCostFunction" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#FindParameters.gradCostFunction">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">adj_action</span><span class="signature">(self, theta, k, coefs, tuples)</span>:
+            <span class="name">gradCostFunction</span><span class="signature">(self, thetas)</span>:
     </div>
 
                 <details>
@@ -1573,33 +1567,17 @@ If loadFileName is provided, does not run the optimizer and instead reads data f
 
         </details>
 
-            <div class="docstring"><p>Computes Ad<sub>k</sub>(m) = e<sup>i•theta</sup>(coefs • tuples)e<sup>-i•theta</sup>
-Also known as the Adjoint Representation</p>
-
-<h6 id="args">Args</h6>
-
-<ul>
-<li><strong>theta (float):</strong>  A single value, the coeffient of the k PauilString</li>
-<li><strong>k (Tuple):</strong>  A (PauliString)</li>
-<li><strong>coefs (List of floats, can be complex):</strong>  The coefficients indexed in order of the elements in tuples</li>
-<li><strong>tuples (List of tuples):</strong>  A List of (PauliStrings)</li>
-</ul>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <p>The Algebraic element in m which is the result of the Adjoint Action (Representation)</p>
-</blockquote>
+            <div class="docstring"><p>returns gradient of funky. Order of derivatives is the order of the parameters thetas.</p>
 </div>
 
 
                             </div>
-                            <div id="FindParameters.sethVecFromk" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#FindParameters.sethVecFromk">#&nbsp;&nbsp</a>
+                            <div id="FindParameters.adj_action" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#FindParameters.adj_action">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">sethVecFromk</span><span class="signature">(self)</span>:
+            <span class="name">adj_action</span><span class="signature">(self, theta, k, coefs, tuples)</span>:
     </div>
 
                 <details>
@@ -1644,17 +1622,33 @@ Also known as the Adjoint Representation</p>
 
         </details>
 
-            <div class="docstring"><p>Returns h = exp(-thetas•k)•H•exp(thetas•k)</p>
+            <div class="docstring"><p>Computes Ad<sub>k</sub>(m) = e<sup>i•theta</sup>(coefs • tuples)e<sup>-i•theta</sup>
+Also known as the Adjoint Representation</p>
+
+<h6 id="args">Args</h6>
+
+<ul>
+<li><strong>theta (float):</strong>  A single value, the coeffient of the k PauilString</li>
+<li><strong>k (Tuple):</strong>  A (PauliString)</li>
+<li><strong>coefs (List of floats, can be complex):</strong>  The coefficients indexed in order of the elements in tuples</li>
+<li><strong>tuples (List of tuples):</strong>  A List of (PauliStrings)</li>
+</ul>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <p>The Algebraic element in m which is the result of the Adjoint Action (Representation)</p>
+</blockquote>
 </div>
 
 
                             </div>
-                            <div id="FindParameters.errorhVec" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#FindParameters.errorhVec">#&nbsp;&nbsp</a>
+                            <div id="FindParameters.sethVecFromk" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#FindParameters.sethVecFromk">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">errorhVec</span><span class="signature">(self)</span>:
+            <span class="name">sethVecFromk</span><span class="signature">(self)</span>:
     </div>
 
                 <details>
@@ -1662,6 +1656,10 @@ Also known as the Adjoint Representation</p>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">sethVecFromk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns h = exp(-thetas•k)•H•exp(thetas•k)</span>
+
+<span class="sd">        Defines hErrorTuples and hErrorCoefs, which are the exact result of the adjoint representation. The result is in m, not in h, though it is mostly in h. </span>
+
+<span class="sd">        hCoefs and hTuples are the results stripped of the components in m</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">I</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -1691,17 +1689,21 @@ Also known as the Adjoint Representation</p>
 
         </details>
 
-            <div class="docstring"><p>Gets the norm square of the part in hcoefs•htuples that is orthogonal to Cartan subalgebra h.</p>
+            <div class="docstring"><p>Returns h = exp(-thetas•k)•H•exp(thetas•k)</p>
+
+<p>Defines hErrorTuples and hErrorCoefs, which are the exact result of the adjoint representation. The result is in m, not in h, though it is mostly in h. </p>
+
+<p>hCoefs and hTuples are the results stripped of the components in m</p>
 </div>
 
 
                             </div>
-                            <div id="FindParameters.multiplyLinComb" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#FindParameters.multiplyLinComb">#&nbsp;&nbsp</a>
+                            <div id="FindParameters.errorhVec" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#FindParameters.errorhVec">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">multiplyLinComb</span><span class="signature">(self, A, tuplesA, B, tuplesB)</span>:
+            <span class="name">errorhVec</span><span class="signature">(self)</span>:
     </div>
 
                 <details>
@@ -1727,17 +1729,17 @@ Also known as the Adjoint Representation</p>
 
         </details>
 
-            <div class="docstring"><p>Returns multiplication of two linear combinations of Pauli terms</p>
+            <div class="docstring"><p>Gets the norm square of the part in hcoefs•htuples that is orthogonal to Cartan subalgebra h.</p>
 </div>
 
 
                             </div>
-                            <div id="FindParameters.multiplyPauliString" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#FindParameters.multiplyPauliString">#&nbsp;&nbsp</a>
+                            <div id="FindParameters.multiplyLinComb" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#FindParameters.multiplyLinComb">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">multiplyPauliString</span><span class="signature">(self, a, tupleA, b, tupleB)</span>:
+            <span class="name">multiplyLinComb</span><span class="signature">(self, A, tuplesA, B, tuplesB)</span>:
     </div>
 
                 <details>
@@ -1772,35 +1774,17 @@ Also known as the Adjoint Representation</p>
 
         </details>
 
-            <div class="docstring"><p>Computes the multiplication of two Pauli Strings representated as a tuple</p>
-
-<h6 id="args">Args</h6>
-
-<ul>
-<li><strong>a (np.complex128):</strong>   The coefficient of the first Pauli String term</li>
-<li><strong>tupleA (Tuple or index in g):</strong>  tuple represenation of the first Pauli String</li>
-<li><strong>b (np.complex128):</strong>  The coefficient of the second Pauli String term</li>
-<li><strong>tupleB (Tuple or index in g):</strong>   tuple represenation of the second Pauli String</li>
-</ul>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <p>c (np.complex128):
-      The coefficient of the result a•TupleA . b•TupleB = c•TupleC, where c (the sign of the product of Paulis • a • b)
-  tupleC (tuple) :
-      the elementwise product of the PauliString, ignoring coefficients.</p>
-</blockquote>
+            <div class="docstring"><p>Returns multiplication of two linear combinations of Pauli terms</p>
 </div>
 
 
                             </div>
-                            <div id="FindParameters.commutatePauliString" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#FindParameters.commutatePauliString">#&nbsp;&nbsp</a>
+                            <div id="FindParameters.multiplyPauliString" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#FindParameters.multiplyPauliString">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">commutatePauliString</span><span class="signature">(self, a, tupleA, b, tupleB)</span>:
+            <span class="name">multiplyPauliString</span><span class="signature">(self, a, tupleA, b, tupleB)</span>:
     </div>
 
                 <details>
@@ -1847,36 +1831,35 @@ Also known as the Adjoint Representation</p>
 
         </details>
 
-            <div class="docstring"><p>Computes the commutator of two Pauli Strings representated as a tuple</p>
+            <div class="docstring"><p>Computes the multiplication of two Pauli Strings representated as a tuple</p>
 
 <h6 id="args">Args</h6>
 
 <ul>
 <li><strong>a (np.complex128):</strong>   The coefficient of the first Pauli String term</li>
-<li><strong>tupleA (Tuple, integer):</strong>   tuple represenation of the first Pauli String, or the index in the commutator table</li>
-<li><strong>b (np.complex128):</strong>   The coefficient of the second Pauli String term</li>
-<li><strong>tupleB (tuple, int):</strong>   tuple represenation of the second Pauli String, or the index in the commutator table</li>
+<li><strong>tupleA (Tuple or index in g):</strong>  tuple represenation of the first Pauli String</li>
+<li><strong>b (np.complex128):</strong>  The coefficient of the second Pauli String term</li>
+<li><strong>tupleB (Tuple or index in g):</strong>   tuple represenation of the second Pauli String</li>
 </ul>
 
 <h6 id="returns">Returns</h6>
 
 <blockquote>
   <p>c (np.complex128):
-      The coefficient of the result [a•TupleA,b•TupleB] = c•TupleC, where c is the Structure Constant • a • b.</p>
-  
-  <p>tupleC (tuple): 
-      the elementwise commutator of the PauliString, ignoring coefficients.</p>
+      The coefficient of the result a•TupleA . b•TupleB = c•TupleC, where c (the sign of the product of Paulis • a • b)
+  tupleC (tuple) :
+      the elementwise product of the PauliString, ignoring coefficients.</p>
 </blockquote>
 </div>
 
 
                             </div>
-                            <div id="FindParameters.multiplyLinCombRound" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#FindParameters.multiplyLinCombRound">#&nbsp;&nbsp</a>
+                            <div id="FindParameters.commutatePauliString" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#FindParameters.commutatePauliString">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">multiplyLinCombRound</span><span class="signature">(self, A, tuplesA, B, tuplesB, accur)</span>:
+            <span class="name">commutatePauliString</span><span class="signature">(self, a, tupleA, b, tupleB)</span>:
     </div>
 
                 <details>
@@ -1934,17 +1917,36 @@ Also known as the Adjoint Representation</p>
 
         </details>
 
-            <div class="docstring"><p>Returns multiplication of two linear combinations of Pauli terms, and rounds things that are smaller than accur to zero.</p>
+            <div class="docstring"><p>Computes the commutator of two Pauli Strings representated as a tuple</p>
+
+<h6 id="args">Args</h6>
+
+<ul>
+<li><strong>a (np.complex128):</strong>   The coefficient of the first Pauli String term</li>
+<li><strong>tupleA (Tuple, integer):</strong>   tuple represenation of the first Pauli String, or the index in the commutator table</li>
+<li><strong>b (np.complex128):</strong>   The coefficient of the second Pauli String term</li>
+<li><strong>tupleB (tuple, int):</strong>   tuple represenation of the second Pauli String, or the index in the commutator table</li>
+</ul>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <p>c (np.complex128):
+      The coefficient of the result [a•TupleA,b•TupleB] = c•TupleC, where c is the Structure Constant • a • b.</p>
+  
+  <p>tupleC (tuple): 
+      the elementwise commutator of the PauliString, ignoring coefficients.</p>
+</blockquote>
 </div>
 
 
                             </div>
-                            <div id="FindParameters.printResult" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#FindParameters.printResult">#&nbsp;&nbsp</a>
+                            <div id="FindParameters.multiplyLinCombRound" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#FindParameters.multiplyLinCombRound">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">printResult</span><span class="signature">(self)</span>:
+            <span class="name">multiplyLinCombRound</span><span class="signature">(self, A, tuplesA, B, tuplesB, accur)</span>:
     </div>
 
                 <details>
@@ -1975,6 +1977,34 @@ Also known as the Adjoint Representation</p>
                     <span class="n">csize</span> <span class="o">=</span> <span class="n">csize</span> <span class="o">+</span> <span class="mi">1</span>
         
         <span class="k">return</span> <span class="n">C</span><span class="p">,</span> <span class="n">tuplesC</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Returns multiplication of two linear combinations of Pauli terms, and rounds things that are smaller than accur to zero.</p>
+</div>
+
+
+                            </div>
+                            <div id="FindParameters.printResult" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#FindParameters.printResult">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">printResult</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">printResult</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Prints out the results of the otpimization &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Printing Results:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;K elements </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">co</span><span class="p">,</span> <span class="n">tup</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kCoefs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">k</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">co</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;*&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">IO</span><span class="o">.</span><span class="n">paulilabel</span><span class="p">(</span><span class="n">tup</span><span class="p">)))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> h elements: </span><span class="se">\n</span><span class="s1"> &#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">co</span><span class="p">,</span> <span class="n">tup</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hCoefs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">h</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">co</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;*&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">IO</span><span class="o">.</span><span class="n">paulilabel</span><span class="p">(</span><span class="n">tup</span><span class="p">)))</span>
 </pre></div>
 
         </details>
