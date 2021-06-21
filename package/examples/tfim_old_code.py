@@ -283,11 +283,11 @@ def simplifyLinComb(A,tuples):
     size = len(A)
     
     index = 0
-    fs
+    
     while index < size:
         flag = 0
-        for i in range(index): 
-            if tuples[i]==tuples[index]:    
+        for i in range(index):
+            if tuples[i]==tuples[index]:
                 A[i] = A[i]+A[index]
                 A.pop(index)
                 tuples.pop(index)
@@ -541,7 +541,7 @@ def printlist(tuples):
             chars = 0
         
     
-    print(res+'\n\n\n')
+    print(res)
 
 
 '''
@@ -586,7 +586,7 @@ def printterms(coefs,tuples):
                 res = res + '\n'
                 chars = 0
     
-    print(res+'\n\n\n')
+    print(res)
     
 '''
     Transforms numbers in tuples to Pauli terms
@@ -610,7 +610,7 @@ def paulilabel(p):
     Theta is just one number. k is just one Pauli term.
     Returns exp(i*theta*k)*(coefs*tuples)*exp(-i*theta*k) which is Adjoint action on the linear combination by thata*k.
 '''
-def adj_action(theta,k,coefs,tuples):
+def adj_action(theta,k,coefs,tuples): #tuples, coefs are lists of tuples
     
     result = [[],[]]
     
@@ -637,9 +637,6 @@ def adj_action(theta,k,coefs,tuples):
     return result
 
 
-callcount = 0 
-
-
 
 '''
    This returns Tr(exp(thetas1*k1)*v*exp(-thetas2*k2)*H)
@@ -648,8 +645,6 @@ callcount = 0
 def funkygeneral(thetas1, thetas2, k_ints ,k, h, Hcoefs, Htuples, accur, index):  #index ==== how many elements will go for v, Htuples is an int list
     
     
-    global callcount
-    callcount = callcount + 1
     
     pi = math.pi
     hcoefs = [1]
@@ -662,13 +657,13 @@ def funkygeneral(thetas1, thetas2, k_ints ,k, h, Hcoefs, Htuples, accur, index):
         hcoefs.append(term)
       
 
-    resH = [Hcoefs,Htuples] 
-    resV = [hcoefs,range(len(k_tuples),len(k_tuples)+len(h_tuples))]
+    resH = [Hcoefs,Htuples] #[[coefficient list],[Tuple List]]
+    resV = [hcoefs,range(len(k_tuples),len(k_tuples)+len(h_tuples))] 
     #resV = [hcoefs,h]
     
     maxsize = 0
     
-    for i in range(len(thetas1)-1,index,-1):
+    for i in range(len(thetas1)-1,index,-1): #
         resV = adj_action(thetas1[i],k_ints[i],resV[0],resV[1])
         #if len(resV[0])>maxsize:
         #    maxsize = len(resV[0])
@@ -687,6 +682,7 @@ def funkygeneral(thetas1, thetas2, k_ints ,k, h, Hcoefs, Htuples, accur, index):
     
 
     #create identity matrix for this dimensions
+
     I = (0,)*len(k[0])
     
     
@@ -694,8 +690,9 @@ def funkygeneral(thetas1, thetas2, k_ints ,k, h, Hcoefs, Htuples, accur, index):
     
     if index >= 0:
         resV = multiplyLinCombRound([math.cos(thetas1[index]),1j*math.sin(thetas1[index])],[I,k[index]],resV[0],resV[1],accur)    
+        
         resV = multiplyLinCombRound(resV[0],resV[1],[math.cos(thetas2[index]),-1j*math.sin(thetas2[index])],[I,k[index]],accur)    
-    
+
             
     #get trace of v*H
     trace = 0
@@ -716,11 +713,9 @@ def funky(thetas, k_ints, k, h, Hcoefs, Htuples, accur):
     #k_ints = range(len(k))
     
     val = funkygeneral(thetas, thetas, k_ints, k, h, Hcoefs, Htuples, accur,-1)
-    
+
     result = val.real
-    global callcount
-    #print(str(callcount) + ' ' + str(result))
-    callcount = callcount + 1
+    
     return result
 
 '''
@@ -740,54 +735,6 @@ def gradfunky(thetas, k_ints, k, h, Hcoefs, Htuples, accur):
         
         res[i] = diff.real
         
-    return res
-
-
-'''
-    returns Tr(exp(thetas*k)*v*exp(-thetas*k)*H)
-'''
-def funky2(thetas, k_ints, k, h, Hcoefs, Htuples, accur):
-    
-    
-    thetas2 = np.zeros(2*len(thetas))
-    for i in range(len(thetas)):
-        thetas2[2*i] = thetas[i]
-        thetas2[2*i+1] = -thetas[i]
-    
-    
-    
-    val = funkygeneral(thetas2, thetas2, k_ints, k, h, Hcoefs, Htuples, accur,-1)
-    
-    result = val.real
-    global callcount
-    #print(str(callcount) + ' ' + str(result))
-    callcount = callcount + 1
-    return result
-
-'''
-    returns gradient of funky. Order of derivatives is the order of the parameters thetas.
-'''
-def gradfunky2(thetas, k_ints, k, h, Hcoefs, Htuples, accur):
-    
-    
-    thetas2 = np.zeros(2*len(thetas))
-    for i in range(len(thetas)):
-        thetas2[2*i] = thetas[i]
-        thetas2[2*i+1] = -thetas[i]
-    
-    res = np.zeros(len(thetas))
-        
-    for i in range(len(thetas)):
-        thetascopye = thetas2.copy()
-        thetascopyo = thetas2.copy()
-        
-        thetascopye[2*i] = thetascopye[2*i]+math.pi/2
-        thetascopyo[2*i+1] = thetascopyo[2*i+1]+math.pi/2
-        
-        diff = funkygeneral(thetascopye,thetas2, k_ints, k, h, Hcoefs, Htuples, accur,2*i) + funkygeneral(thetas2,thetascopye, k_ints, k, h, Hcoefs, Htuples, accur,2*i) - funkygeneral(thetascopyo,thetas2, k_ints, k, h, Hcoefs, Htuples, accur,2*i+1) - funkygeneral(thetas2,thetascopyo, k_ints, k, h, Hcoefs, Htuples, accur,2*i+1)
-        
-        res[i] = diff.real
-      
     return res
 
 
@@ -853,7 +800,7 @@ def optimize(initialGuess, accuracy, steps, k_ints, k,h,Hcoefs,Htuples, accur, o
     elif optimizerType == 'BFGS':
         
         if sym == 'yes sym':
-            optimiumReturn = scipy.optimize.minimize(funky2,initialGuess,args = (k_ints,k,h,Hcoefs,Htuples, accur) ,method='BFGS', jac = gradfunky2,options={'disp':True, 'gtol':accuracy, 'maxiter':steps})
+            optimiumReturn = scipy.optimize.minimize(funky,initialGuess,args = (k_ints,k,h,Hcoefs,Htuples, accur) ,method='BFGS', jac = gradfunky,options={'disp':True, 'gtol':accuracy, 'maxiter':steps})
             return optimiumReturn.x
         else:
             optimiumReturn = scipy.optimize.minimize(funky,initialGuess,args = (k_ints,k,h,Hcoefs,Htuples, accur) ,method='BFGS', jac = gradfunky,options={'disp':True, 'gtol':accuracy, 'maxiter':steps})
@@ -873,7 +820,7 @@ def optimize(initialGuess, accuracy, steps, k_ints, k,h,Hcoefs,Htuples, accur, o
     HAMILTONIAN GENERATORS
 '''
 
-def hubbard(N):
+def hubbard(N): #|up, up, down down> XXII + YYII + IIXX + IIYY + ZIZI + IZIZ N = 2
     
     H = []
     for i in range(N-1):
@@ -916,7 +863,7 @@ def xymodel(N,bc):
         
     return H
 
-def xymodel_2nd(N,bc):
+def xymodel_2nd(N,bc): #Second order nearest neighbor + first order
     
     H = []
     
@@ -1066,7 +1013,7 @@ def tfxy(N,bc):
 '''        
 
     
-def getpaulirep(M,N):
+def getpaulirep(M,N): #Get pauliString from matrix M is matrix, N = dimension of matrix
     
     if N == 2:
         L = [0,0,0,0]
@@ -1107,7 +1054,7 @@ def getpaulirep(M,N):
             LZ[1][i] = (3,) + LZ[1][i]
             
         terms = LI[1] + LX[1] + LY[1] + LZ[1]
-        return L,terms
+        return L,terms #COefficient list, [PauliMatrixTuple,...] List
         
     
     
@@ -1120,10 +1067,10 @@ def tfxyresults(N, accur,partial, devcount, maxdev, rep, sym):
     #accur = 0.00001
     steps = 4500
     
-    Htuples = tfxy(N,'open')
+    Htuples = tfxy(N,'closed')
     
-    print('H:\n')
-    printlist(Htuples)
+    #print('H:\n')
+    #printlist(Htuples)
     
     g = makeGroup(Htuples)
     
@@ -1132,45 +1079,15 @@ def tfxyresults(N, accur,partial, devcount, maxdev, rep, sym):
     h = getsubalgebra(m)
     
     set_tuples(k,m,h)
-    
-    k = []
-    
-    if rep == 'cascade':
-        for i in range(N):
-            for j in range(N-i-1):
-                elem = (0,)*i + (2,) + (3,)*j + (1,) + (0,)*(N-j-i-2)
-                k.append(elem)
-                
-                
-                elem = (0,)*i + (1,) + (3,)*j + (2,) + (0,)*(N-j-i-2)
-                k.append(elem)
-                '''
-        for i in range(N):
-            for j in range(N-i-1):
-                elem = (0,)*i + (1,) + (3,)*j + (2,) + (0,)*(N-j-i-2)
-                k.append(elem)
-'''
         
-    elif rep == 'pile':
-        for i in range(N-1):
-            for j in range(N-i-1):
-                elem = (0,)*j+(2,1)+(0,)*(N-j-2)
-                k.append(elem)
-                
-                elem = (0,)*j+(1,2)+(0,)*(N-j-2)
-                k.append(elem)
-                
-
-            
-    
-    k_ints = [] #List of indices for the k tuples in g?
+    k_ints = [] #List of indices for the k tuples in g? [(),(),()] --> [3,4,5]
     for i in range(len(k)):
         for j in range(len(g_tuples)):
             if k[i] == g_tuples[j]:
-                k_ints.append(j)
+                k_ints.append(j) 
                 break
             
-    print(k_ints)        
+    #print(k_ints)        
             
     
     
@@ -1182,143 +1099,50 @@ def tfxyresults(N, accur,partial, devcount, maxdev, rep, sym):
                 break
     
     
-    print('k:\n')
+    print('k:')
     printlist(k)
-    print('m:\n')
+    print('m:')
     printlist(m)
-    print('h:\n')
+    print('h:')
     printlist(h)
     
     
-    initialGuess = np.zeros(len(k))
-    if sym == 'yes sym':
-        initialGuess = np.zeros(int(len(k)/2))
-    
-    
-    Hcoefs0 = np.ones(len(Htuples)) #No Idea
-    for j in range(N):
-        Hcoefs0[j] = 0
-    
-    perturb = np.random.normal(0,1,len(Htuples)) #Leave out for now
-    for j in range(N,len(Htuples)):
-        #print(j)
-        perturb[j] = 0
-        
-    print(perturb)
-    print(Hcoefs0)
-    
+    initialGuess = np.zeros(len(k))  
 
-    
-    
-    Bcount = devcount #?????
-    
-    
+    Hcoefs = np.ones(len(Htuples)) #No Idea
+
     errors = []
     times = []
     hcoefslist = []
     
     angles = []
-    B = [] #?????
-    
-    
-    for i in range(Bcount): #????
-        
-        std = maxdev*i/(Bcount-1)
-        print(std)
-    
-    
-    
-    for i in range(Bcount):
-        
-        std = maxdev*i/(Bcount-1)
-        Hcoefs = Hcoefs0 + std * perturb #Generates the hamiltonian
-        B.append(std)
-        
-        total_time = time.time()
-        thetas = optimize(initialGuess, accuracy, steps, k_ints,k,h,Hcoefs,Htuplesint,0,'BFGS',sym)
-        #thetas = optimize(initialGuess, accuracy, steps, k,h,Hcoefs,Htuplesint,0,'Powell')
-        timepassed = time.time() - total_time
-        print('--- ' + str(timepassed) +  ' seconds ---')
-        
-        times.append(timepassed)
-        
-        initialGuess = thetas
-        
-        thetas2 = np.copy(thetas)
-        
-        if sym == 'yes sym':
-            thetas2 = np.zeros(2*len(thetas))
-            for w in range(len(thetas)):
-                thetas2[2*w] = thetas[w]
-                thetas2[2*w+1] = -thetas[w]
-                
-        
-        angles.append(thetas2)
-    
-        [hcoefs,htuples] = gethVecFromk(thetas2, k, Hcoefs, Htuples)
-    
-        hcfs = []
-        
-        for w in h:
-            hflag = 0
-            for u in range(len(htuples)):
-                if w == htuples[u]:
-                    hcfs.append(hcoefs[u])
-                    hflag = 1
-                    break
-            if hflag == 0:
-                hcfs.append(0)
-        
-        hcoefslist.append(hcfs)
-        '''
-        print(hcoefs)
-        printlist(htuples)
-        printlist(h)
-        '''
-    
-    
-        error1 = errorhVec(hcoefs,htuples,h)
-        cleancoefs(hcoefs,accur)
-             
-    
-        error2 = errorhVec(hcoefs,htuples,h)
-        print('Error1: ' + str(error1) + '\tError2: ' + str(error2))  
-              
-        errors.append(error1)
-        
-        if partial == 'partial':
-            #filename = 'current_running/'+'tfxy_withminus_step'+str(i)+'_outof_'+str(Bcount)
-            filename = 'current_running/'+'tfxy_step'+str(i)+'_outof_'+str(Bcount)
-            print(filename)
-            np.savez(filename,k = k, m = m, h = h, inter = B, angles = angles, errors = errors, times = times)
-            npzfile = np.load(filename+'.npz')    
-            print(npzfile['errors'])
-            print(npzfile['times'])
 
-            
-    print(B)
+    total_time = time.time()
+    thetas = optimize(initialGuess, accuracy, steps, k_ints,k,h,Hcoefs,Htuplesint,0,'Powell',sym)
+    #thetas = optimize(initialGuess, accuracy, steps, k,h,Hcoefs,Htuplesint,0,'Powell')
+    timepassed = time.time() - total_time
+    print('--- ' + str(timepassed) +  ' seconds ---')
     
+    [hcoefs,htuples] = gethVecFromk(thetas, k, Hcoefs, Htuples)
     
-    finangles = []
-    for i in range(len(angles[0])):
-        finangles.append([])
-    
-    for i in range(len(angles)):
-        for j in range(len(angles[0])):
-            finangles[j].append(angles[i][j])
-    
-    for i in range(len(finangles)):
-        plt.plot(B,finangles[i], label = paulilabel(k[i]))
-              
-    #filename = 'current_running/'+str(N)+'tfxy_withminus'
-    filename = str(N)+'tfxy'
-    np.savez(filename,k = k, m = m, h = h, inter = B, angles = finangles, hcoefs = hcoefslist, errors = errors, times = times, Htuples = Htuples, Hcoefs0 = Hcoefs0, perturb = perturb)
-    
-    plt.legend()
-    plt.show()
-    plt.savefig(filename, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None, transparent=False, bbox_inches=None, pad_inches=0.1, frameon=None, metadata=None)
-    
+    print(thetas)
+    hcfs = []
+        
+    for w in h:
+        hflag = 0
+        for u in range(len(htuples)):
+            if w == htuples[u]:
+                hcfs.append(hcoefs[u])
+                hflag = 1
+                break
+        if hflag == 0:
+            hcfs.append(0)
+
+    print(hcfs)
+
+    error1 = errorhVec(hcoefs,htuples,h)
+    print(error1)
 
     
     
-tfxyresults(4, 0.001,'no', 5, 4, 'pile', 'yes')
+tfxyresults(4, 1e-5,'no', 5, 4, 'pile', 'no')

@@ -52,18 +52,18 @@ I = np.array([[1,0],[0,1]])
 #Allows for indexing the Pauli Arrays (Converting from tuple form (0,1,2,3) to string form IXYZ)
 paulis = [I,X,Y,Z]
 
-def commutatePauliString(a,tupleA,b,tupleB):
+def commutatePauliString(a,tupleA,b,tupleB, comm_coefs = None, comm_table = None):
     """Computes the commutator of two Pauli Strings representated as a tuple
 
     Args:
         a (np.complex128): 
             The coefficient of the first Pauli String term
-        tupleA (Tuple): 
-            tuple represenation of the first Pauli String
+        tupleA (Tuple, integer): 
+            tuple represenation of the first Pauli String, or the index in the commutator table
         b (np.complex128): 
             The coefficient of the second Pauli String term
-        tupleB (tuple): 
-            tuple represenation of the second Pauli String
+        tupleB (tuple, int): 
+            tuple represenation of the second Pauli String, or the index in the commutator table
     
     Returns:
         c (np.complex128):
@@ -123,6 +123,7 @@ def multiplyPauliString(a,tupleA,b,tupleB):
         tupleC (tuple) :
             the elementwise product of the PauliString, ignoring coefficients. 
     """
+      
     sites = len(tupleA)
     #builds up the result Tuple C
     tupleC = ()
@@ -136,7 +137,7 @@ def multiplyPauliString(a,tupleA,b,tupleB):
         sign = sign * SIGN_RULES[tupleA[i]][tupleB[i]]
         
     c = a * b * sign
-    return c, tupleC
+    return c, tupleC  
 
 
 

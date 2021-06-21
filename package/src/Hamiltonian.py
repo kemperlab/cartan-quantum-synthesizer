@@ -15,7 +15,7 @@ Authors:
 * Thomas Steckmann
 * Efekan Kokcu
 """
-from IO import printlist, paulilabel
+from package.util.IO import printlist, paulilabel
 
 #from ..package.IO import printlist, paulilabel
 
@@ -27,12 +27,12 @@ class Hamiltonian:
             name (List of Tuples): Easily build Hamiltonians from native models. 
 
                 ### Options:
-                    * `[(coefficient, 'modelname', periodic boundary condisitons boolian)]` - Builds a single Hamiltonian with constant coefficient. Periodic boundary conditions are true or false, false is assumed if not specified
-                    * `[([list of coefficients], 'modelname')]` - Populates the Hamiltonian using the list of coefficients. Lengths must match
-                    * `[(coefficient, 'modelname1'),([list of coefficients], 'modelname2')]` - Combines two Hamiltonains. Order my alter default choice of 𝖍
+                    - `[(coefficient, 'modelname', periodic boundary condisitons boolian)]` - Builds a single Hamiltonian with constant coefficient. Periodic boundary conditions are true or false, false is assumed if not specified
+                    - `[([list of coefficients], 'modelname')]` - Populates the Hamiltonian using the list of coefficients. Lengths must match
+                    - `[(coefficient, 'modelname1'),([list of coefficients], 'modelname2')]` - Combines two Hamiltonains. Order my alter default choice of 𝖍
                 #### Examples:
-                    * `[(1,'XY', true)]` on three qubits gives: XXI + YYI + IXX + IYY + XIX + YIY
-                    * `[([1,2],'kitaevEven')] on three qubits gives: 1*XXI + 2*IYY 
+                    - `[(1,'XY', true)]` on three qubits gives: XXI + YYI + IXX + IYY + XIX + YIY
+                    - `[([1,2],'kitaevEven')] on three qubits gives: 1*XXI + 2*IYY 
                 ### Currently Implemented Models:
                     - xy: (XX + YY)
                     - xx: (XXI + IXX)
@@ -274,3 +274,45 @@ class Hamiltonian:
         else:
             raise Exception("Invalid Model. Valid models include: 'XX', 'YY', 'ZZ', 'XY', 'KitaevEven', 'KitaevOdd', 'Heisenberg', TransverseIsing', and 'Transverse_Z'")
         return hamiltonian
+        
+    def getHamiltonian(self, type='tuples'):
+        """ Based on the type, returns the Hamiltonian from the object and formats it.
+        Args:
+            type (String, default = 'tuples'): Specifies the return type of the function.
+                Valid inputs::
+
+                 - 'tuples': Return formatted as `[(coefficient, (PauliString), ... ]`
+
+                 - 'printTuples': Prints out to the console ``(coefficient, (PauliString)) \n ...``
+
+                 - 'printText': Prints out ``'coefficient * 'PauliString' + ....``
+
+                 - 'text': Return formatted as a list of `[[coefficient, 'PauliString']]`
+        
+        Returns:
+            For type=`'tuples'` or type=`'text'`, returns
+
+            - `'tuples'`: A list of Coefficient, (PauliString) Tuple pairs
+            - `'text'`: A List of Coefficient 'PauliString' List pairs
+        
+        Raises:
+            ValueError: Invalid type
+        """
+        if type == 'tuples':
+            returnVal = []
+            for (co, tup) in zip(self.HCoefs, self.HTuples):
+                returnVal.append((co,tup))
+            return returnVal
+        elif type == 'printTuples':
+            for (co, tup) in zip(self.HCoefs, self.HTuples):
+                print((co,tup))
+        elif type == 'printText':
+            for (co, tup) in zip(self.HCoefs, self.HTuples):
+                print(str(co) + " * " + str(paulilabel(tup))) #Prints coefficient'pauliString'
+        elif type == 'text':
+            returnlist = []
+            for (co, tup) in zip(self.HCoefs, self.HTuples):
+                returnlist.append([co,  str(paulilabel(tup))]) #Prints coefficient'pauliString'
+            return returnlist
+        else:
+            raise ValueError('Invalid Type: Must be "tuples", "printTuples", "printText", or "text"')

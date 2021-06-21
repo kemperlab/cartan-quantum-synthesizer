@@ -1,4 +1,8 @@
-from Hamiltonian import Hamiltonian
+import sys
+sys.path.append('c:\\Users\\Thoma\\OneDrive\\Documents\\2021_ORNL\\CartanCodeGit\\cartan-quantum-synthesizer')
+print(sys.path)
+import package.src
+from package.src.Hamiltonian import Hamiltonian
 
 print('generic XY')
 xymodel = Hamiltonian(4, name=[(1, 'xy')])
