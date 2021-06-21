@@ -20,8 +20,8 @@ from the main folder (requires pdoc)
 
 # General Notes:
 PauliStrings are formatted as one of the following:
-* Text based: AKA 'PauliString' formats the Pauli String σ<sub>x</sub>⦻σ<sub>y</sub>⦻σ<sub>z</sub>⦻σ<sub>I</sub>⦻σ<sub>I</sub> as `XYZII`
-* Tuple Bases: AKA (PauliString) formats σ<sub>x</sub>⦻σ<sub>y</sub>⦻σ<sub>z</sub>⦻σ<sub>I</sub>⦻σ<sub>I</sub> as `(1,2,3,0,0)` where each 0,1,2,3 referes the the standard index of the Pauli matricies: I, X, Y, Z/.
+* Text based: AKA 'PauliString' formats the Pauli String σ<sub>x</sub>⊗σ<sub>y</sub>⊗σ<sub>z</sub>⊗σ<sub>I</sub>⊗σ<sub>I</sub> as `XYZII`
+* Tuple Bases: AKA (PauliString) formats σ<sub>x</sub>⊗σ<sub>y</sub>⊗σ<sub>z</sub>⊗σ<sub>I</sub>⊗σ<sub>I</sub> as `(1,2,3,0,0)` where each 0,1,2,3 referes the the standard index of the Pauli matricies: I, X, Y, Z/.
 # Usage:
 The functionality is based on three object classes:
 <ol>

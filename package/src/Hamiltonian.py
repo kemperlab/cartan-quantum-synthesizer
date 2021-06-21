@@ -31,8 +31,8 @@ class Hamiltonian:
                     - `[([list of coefficients], 'modelname')]` - Populates the Hamiltonian using the list of coefficients. Lengths must match
                     - `[(coefficient, 'modelname1'),([list of coefficients], 'modelname2')]` - Combines two Hamiltonains. Order my alter default choice of 𝖍
                 #### Examples:
-                    - `[(1,'XY', true)]` on three qubits gives: XXI + YYI + IXX + IYY + XIX + YIY
-                    - `[([1,2],'kitaevEven')] on three qubits gives: 1*XXI + 2*IYY 
+                    - `[(1,'xy', True)]` on three qubits gives: XXI + YYI + IXX + IYY + XIX + YIY
+                    - `[([1,2],'kitaevEven')]` on three qubits gives: 1*XXI + 2*IYY 
                 ### Currently Implemented Models:
                     - xy: (XX + YY)
                     - xx: (XXI + IXX)
@@ -44,7 +44,7 @@ class Hamiltonian:
                     - kitaev_even: (XXI + IYY)
                     - kitaev_odd: (YYI + IXX)
                     - heisenberg: (XX + YY + ZZ)
-                    - hubbard: (XXII + YYII + IIXX + IIYY + ZIZI + IZIZ)
+                    - TODO: hubbard: (XXII + YYII + IIXX + IIYY + ZIZI + IZIZ)
         """
         self.sites = sites
         self.HTuples = []
@@ -71,7 +71,7 @@ class Hamiltonian:
                     - kitaev_even: (XXI + IYY)
                     - kitaev_odd: (YYI + IXX)
                     - heisenberg: (XX + YY + ZZ)
-                    - hubbard: (XXII + YYII + IIXX + IIYY + ZIZI + IZIZ)
+                    - TODO: hubbard: (XXII + YYII + IIXX + IIYY + ZIZI + IZIZ)
         
         Raises:
             ValueError:  Coefficient list length mismatch
@@ -118,7 +118,7 @@ class Hamiltonian:
         Examples:
             * `Hamiltonian.addTerms((0.45, (1,3,2,0,0,0)))`
             * `Hamiltonian.addTerms([(1,(1,1,0,0)),(2,(2,2,0,0))])
-            * `Hamiltonian.addTerms(([co1, co2, co3, ...],[(PauliString1),(PauliString2),(PauliString3)...])
+            * `Hamiltonian.addTerms(([co1, co2, co3, ...],[(PauliString1),(PauliString2),(PauliString3)...])`
 
         """
         if isinstance(pairs, list): #Verifies the User input - if a list, iterates over it
@@ -143,7 +143,7 @@ class Hamiltonian:
         From the model type, generates the Hamiltonian Pauli Strings
 
         Args: 
-            modelType (Tuple of Strings): 
+            modelType (Tuple of Strings): See previous documentation
             closed (bool): 
                 True if the model is period.
 
@@ -279,7 +279,7 @@ class Hamiltonian:
         """ Based on the type, returns the Hamiltonian from the object and formats it.
         Args:
             type (String, default = 'tuples'): Specifies the return type of the function.
-                Valid inputs::
+                Valid inputs:
 
                  - 'tuples': Return formatted as `[(coefficient, (PauliString), ... ]`
 
