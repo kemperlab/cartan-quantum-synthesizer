@@ -8,8 +8,8 @@ import numpy as np
 from package.util.IO import tuplesToMatrix
 from package.util.verification import Trotter, exactU, PauliExpUnitary, KHK
 
-sites = 5
-model = [(1,'tfxy', True)]
+sites = 6
+model = [(1,'tfim', False)]
 
 xy = Hamiltonian(sites,model)
 xyC = Cartan(xy)
