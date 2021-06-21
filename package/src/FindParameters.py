@@ -4,8 +4,6 @@ __docformat__ = 'google'
 
 Warning: Very long runtime for more than 8ish qubits
 
-TODO: 
-    Fix the issues with commutatePauliString and the table - probably bring that function here
 Authors:
 * Thomas Steckmann
 * Efekan Kokcu

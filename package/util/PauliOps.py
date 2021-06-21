@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Dec 21 15:16:56 2020
-A Collection of Methods to calcualte useful operations on Pauli Strings
+A Collection of Methods to calculate useful operations on Pauli Strings. Mostly commutators
 
 @author: Thomas Steckmann
 @author: Efekan Kokcu
@@ -12,7 +12,11 @@ import numpy as np
 
 
 ops = ['I','X','Y','Z']
+"""Indices for converting from (PauliString) --> String format"""
+RULES = [1,3,1,3]
 """
+Used for generating the Commutator tables and pauli commutators (efficiently we think)
+``
 RULES:
     Used to find the multiplication between two paulis represented as indices in a tuple (I == 0, X == 1, Y == 2, Z == 3)
 The operation is (index1 + index2*RULES[index1] % 4) = Pauli Matrix result as an index
@@ -24,10 +28,16 @@ X * anythong: (1 + (Index2)*3 % 4) gives
                                          (1 + 2*3) % 4 = 7 % 4 = 3 for Y
                                          (1 + 3*3) % 4 = 10 % 4 = 2 for Z as index2
 These can easily be expanded for Y and Z
+``
 """
-RULES = [1,3,1,3]
-#In version 3, these terms are corrected
+
+SIGN_RULES = [[1,1,1,1], 
+             [1, 1, 1j, -1j],
+             [1, -1j, 1, 1j],
+             [1, 1j, -1j, 1]]
 """
+Rules for computing the sign of two commutators
+```
 SIGN_RULES: 
     Gives the multiplication sign rules for multiplying Pauli Matricies (ex. X*Y -> iZ)
     
@@ -38,22 +48,21 @@ Y +  -i +  +i
 Z +  +i -i +
 
 Order: row * column
+```
 """
-SIGN_RULES = [[1,1,1,1], 
-             [1, 1, 1j, -1j],
-             [1, -1j, 1, 1j],
-             [1, 1j, -1j, 1]]
 
 #The Pauli Matricies in matrix form
 X = np.array([[0,1],[1,0]])
 Y = np.array([[0,-1j],[1j,0]])
 Z = np.array([[1,0],[0,-1]])
 I = np.array([[1,0],[0,1]])
-#Allows for indexing the Pauli Arrays (Converting from tuple form (0,1,2,3) to string form IXYZ)
 paulis = [I,X,Y,Z]
+#Allows for indexing the Pauli Arrays (Converting from tuple form (0,1,2,3) to string form IXYZ)
 
 def commutatePauliString(a,tupleA,b,tupleB, comm_coefs = None, comm_table = None):
     """Computes the commutator of two Pauli Strings representated as a tuple
+    
+    If a commutator table is passed, the operation is much more efficient
 
     Args:
         a (np.complex128): 
@@ -64,6 +73,7 @@ def commutatePauliString(a,tupleA,b,tupleB, comm_coefs = None, comm_table = None
             The coefficient of the second Pauli String term
         tupleB (tuple, int): 
             tuple represenation of the second Pauli String, or the index in the commutator table
+        
     
     Returns:
         c (np.complex128):
