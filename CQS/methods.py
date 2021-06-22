@@ -394,6 +394,11 @@ class Cartan:
     def decompose(self, involutionName):
         """
         Sets a new Involution using a switch. Regenerates h using the default first element in m
+
+        Options:
+                * `'evenOdd'`: m contains an even number of non-identity pauli terms in each string, k contains an odd nunber of non-idenity elements
+                * `'knejaGlaser'`: m contains elements ending in Y or X, k contains elements ending in I or Z
+                * `'count' + 'X', 'Y', or 'Z'`: Counts of the number of the specified Pauli Tuple. Even count in m, odd in k
         """
         self.involution = involutionName #Store involution name
 
