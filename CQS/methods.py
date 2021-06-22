@@ -13,6 +13,7 @@ import math
 from util.PauliOps import commutatePauliString
 import util.IO as IO
 from util.IO import printlist, paulilabel
+import util.verification
 
 
 RULES = [1,3,1,3]
@@ -153,7 +154,15 @@ class Hamiltonian:
                 self.HTuples.append(pairs[1])
                 self.HCoefs.append(pairs[0])
 
+    def removeTerm(self, tup):
+        """Removes the term matching the tuple input. Used for trimming terms off the Hamiltonian
 
+        Args:
+            tup (tuple): A (pauliString)
+        """
+        index = self.HTuples.index(tup)
+        self.HTuples.pop(index)
+        self.HCoefs.pop(index)
 
     def generateHamiltonian(self, modelType, closed = False):
         """Helper Function to generate Hamiltonians.
@@ -334,6 +343,7 @@ class Hamiltonian:
             return returnlist
         else:
             raise ValueError('Invalid Type: Must be "tuples", "printTuples", "printText", or "text"')
+
 class Cartan:
     """
     Class to contain the options for performing Cartan Decomposition on a Hamiltonian
@@ -395,7 +405,22 @@ class Cartan:
             (self.m, self.k) = self.elemcount(self.g, 1)
         elif involutionName == 'countY':
             (self.m, self.k) = self.elemcount(self.g, 2)
-        elif involutionName == 'countZ': (self.m, self.k) = self.elemcount(self.g)
+        elif involutionName == 'countZ': 
+            (self.m, self.k) = self.elemcount(self.g, 3)
+
+        if (self.m == [] or self.k == []):
+            try:
+                print(self.m)
+            
+            except:
+                pass
+
+            try: 
+                print(self.k)
+            except:
+                pass
+
+            raise Exception("Involution Failure")
 
         self.subAlgebra()
 
@@ -558,7 +583,7 @@ class Cartan:
         self.h = h
         #Regenerates the ordering for g, required to generate commutators
 
-        m_tuples = self.m
+        m_tuples = self.m.copy()
         #Strips h from m
         index = 0
         while index < len(m_tuples): #
@@ -570,7 +595,8 @@ class Cartan:
                     break
             if flag == 0:
                 index = index + 1
-        self.g = self.k + self.h + self.m #Reorder g
+        self.g = self.k + self.h + m_tuples #Reorder g
+
 class FindParameters:
     """
     From a Cartan Decomposition, runs the optimizer to find the appropriate parameters for a circuit
@@ -1068,4 +1094,10 @@ class FindParameters:
         print('\n h elements: \n ')
         for (co, tup) in zip(self.hCoefs, self.cartan.h):
             print(str(co).ljust(25) + '*' + str(IO.paulilabel(tup)))
+        print('Normed Error |KHK - Exact|:')
+        U_cartan = util.verification.KHK(self.kCoefs, self.hCoefs,self.cartan.k, self.cartan.h)
+
+        U_exact = util.verification.exactU(self.hamiltonian.HCoefs, self.hamiltonian.HTuples, 1)
+
+        print(np.linalg.norm(U_exact - U_cartan))
         

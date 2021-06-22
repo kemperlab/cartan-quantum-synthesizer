@@ -3,10 +3,8 @@ __docformat__ = 'google'
 """
 Created on Mon Dec 21 15:16:56 2020
 A Collection of Methods to calculate useful operations on Pauli Strings. Mostly commutators
-
 @author: Thomas Steckmann
 @author: Efekan Kokcu
-
 """
 import numpy as np
 
@@ -21,7 +19,6 @@ Used for generating the Commutator tables and pauli commutators (efficiently we 
 RULES:
     Used to find the multiplication between two paulis represented as indices in a tuple (I == 0, X == 1, Y == 2, Z == 3)
 The operation is (index1 + index2*RULES[index1] % 4) = Pauli Matrix result as an index
-
 I * anything: 0 + (Index2)*1 = index2
 X * anythong: (1 + (Index2)*3 % 4) gives
                                          1 + 0 = 1 for I, 
@@ -47,7 +44,6 @@ I +  +  +  +
 X +  +  +i -i
 Y +  -i +  +i
 Z +  +i -i +
-
 Order: row * column
 ```
 """
@@ -64,7 +60,6 @@ def commutatePauliString(a,tupleA,b,tupleB, comm_coefs = None, comm_table = None
     """Computes the commutator of two Pauli Strings representated as a tuple
     
     If a commutator table is passed, the operation is much more efficient
-
     Args:
         a (np.complex128): 
             The coefficient of the first Pauli String term
@@ -117,7 +112,6 @@ def commutatePauliString(a,tupleA,b,tupleB, comm_coefs = None, comm_table = None
 
 def multiplyPauliString(a,tupleA,b,tupleB):
     """Computes the multiplication of two Pauli Strings representated as a tuple
-
     Args:
         a (np.complex128): 
             The coefficient of the first Pauli String term
@@ -127,7 +121,6 @@ def multiplyPauliString(a,tupleA,b,tupleB):
             The coefficient of the second Pauli String term
         tupleB (Tuple): 
             tuple represenation of the second Pauli String
-
     Returns:
         c (np.complex128):
             The coefficient of the result a*TupleA . b*TupleB = c*TupleC, where c (the sign of the product of Paulis * a * b)
