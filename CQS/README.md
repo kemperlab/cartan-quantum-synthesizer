@@ -11,12 +11,18 @@ The functionality is based on three object classes:
 </ol>
 For example, to use these objects to generate the decomposition for the time evolution of the four site 1D lattice XY model, the code would be as follows:
 
-## Import Key elements of the package:
-`from cqs.src.Hamiltonian import Hamiltonian`
+## Installation:
+from the folder `.\CQS\` run:
 
-`from cqs.src.Cartan import Cartan`
+`python setup.py install`
 
-`from cqs.src.FindParameters import FindParameters`
+This will install the package. You can now import the key objects using 
+
+`from methods import *`
+
+which is equivalent to 
+
+`from methods import Hamiltonian, Cartan, FindParameters`
 
 
 ## Define the parameters of the model:
