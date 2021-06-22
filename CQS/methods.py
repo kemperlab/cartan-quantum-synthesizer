@@ -10,10 +10,10 @@ import os
 import math
 
 #Local Imports
-from CQS.util.PauliOps import commutatePauliString
-import CQS.util.IO as IO
-from CQS.util.IO import printlist, paulilabel
-import CQS.util.verification
+from cqs.util.PauliOps import commutatePauliString
+import cqs.util.IO as IO
+from cqs.util.IO import printlist, paulilabel
+import cqs.util.verification
 
 
 RULES = [1,3,1,3]
