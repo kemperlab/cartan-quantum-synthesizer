@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     # Needed to silence warnings (and to be a worthwhile package)
-    name='Cartan Quantum Synthesizer',
+    name='CQS',
     url='https://github.com/kemperlab/cartan-quantum-synthesizer',
     author='Thomas Steckmann, Efekan Kokcu',
     author_email='tmsteckm@ncsu.edu, ekokcu@ncsu.edu',

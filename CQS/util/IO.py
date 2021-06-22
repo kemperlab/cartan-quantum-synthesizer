@@ -10,7 +10,7 @@ authors:
 
 
 from numpy import kron
-from CQS.util.PauliOps import X,Y,Z,I,paulis
+from util.PauliOps import X,Y,Z,I,paulis
 
 def printlist(tuples):
     """Function to Print from Tuple format to string format Pauli Strings

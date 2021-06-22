@@ -1,7 +1,7 @@
 .vscode/
-CQS/__pycache__/
-CQS/build
-CQS/CQS.egg-info
-CQS/dist
+./CQS/__pycache__/
+./CQS/build
+./CQS/CQS.egg-info
+./CQS/dist
 
 
