@@ -4,4 +4,6 @@ CQS/build/
 CQS/CQS.egg-info/
 CQS/dist/
 CQS/util/__pycache__/
-
+CQS.egg-info/
+dist/
+build/

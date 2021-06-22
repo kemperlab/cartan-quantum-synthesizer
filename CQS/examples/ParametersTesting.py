@@ -3,16 +3,21 @@ __docformat__ = 'google'
 '''import sys
 sys.path.append('c:\\Users\\Thoma\\OneDrive\\Documents\\2021_ORNL\\CartanCodeGit\\cartan-quantum-synthesizer')
 #print(sys.path)'''
-from methods import Hamiltonian, Cartan, FindParameters
+from CQS.methods import Hamiltonian, Cartan, FindParameters
 
 import numpy as np
-from util.IO import tuplesToMatrix
-from util.verification import Trotter, exactU, PauliExpUnitary, KHK
+from CQS.util.IO import tuplesToMatrix
+from CQS.util.verification import Trotter, exactU, PauliExpUnitary, KHK
 
 sites = 6
-model = [(1,'tfim', False)]
-
+randCoNumpy = np.random.rand(16)
+randCoList = []
+for i in randCoNumpy:
+    randCoList.append(i)
+model = [(randCoList,'tfxy', False)]
 xy = Hamiltonian(sites,model)
+print(xy.getHamiltonian())
+
 xyC = Cartan(xy)
 xyC.decompose('countY')
 xyP = FindParameters(xyC, optimizerMethod='BFGS')
