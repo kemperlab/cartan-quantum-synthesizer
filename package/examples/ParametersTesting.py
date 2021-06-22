@@ -3,12 +3,20 @@ __docformat__ = 'google'
 '''import sys
 sys.path.append('c:\\Users\\Thoma\\OneDrive\\Documents\\2021_ORNL\\CartanCodeGit\\cartan-quantum-synthesizer')
 #print(sys.path)'''
+<<<<<<< Updated upstream:package/examples/ParametersTesting.py
 from package.methods.Hamiltonian import Hamiltonian
 from package.methods.Cartan import Cartan
 from package.methods.FindParameters import FindParameters
 import numpy as np
 from package.util.IO import tuplesToMatrix
 from package.util.verification import Trotter, exactU, PauliExpUnitary, KHK
+=======
+from CQS.methods import Hamiltonian, Cartan, FindParameters
+
+import numpy as np
+from CQS.util.IO import tuplesToMatrix
+from CQS.util.verification import Trotter, exactU, PauliExpUnitary, KHK
+>>>>>>> Stashed changes:CQS/examples/ParametersTesting.py
 
 sites = 6
 model = [(1,'tfim', False)]

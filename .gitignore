@@ -1,3 +1,7 @@
 .vscode/
-__pycache__/
-package\__init__.py
+CQS/__pycache__/
+CQS/build
+CQS/CQS.egg-info
+CQS/dist
+
+
