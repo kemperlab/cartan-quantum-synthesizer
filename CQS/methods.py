@@ -1095,9 +1095,9 @@ class FindParameters:
         for (co, tup) in zip(self.hCoefs, self.cartan.h):
             print(str(co).ljust(25) + '*' + str(IO.paulilabel(tup)))
         print('Normed Error |KHK - Exact|:')
-        U_cartan = util.verification.KHK(self.kCoefs, self.hCoefs,self.cartan.k, self.cartan.h)
+        U_cartan = CQS.util.verification.KHK(self.kCoefs, self.hCoefs,self.cartan.k, self.cartan.h)
 
-        U_exact = util.verification.exactU(self.hamiltonian.HCoefs, self.hamiltonian.HTuples, 1)
+        U_exact = CQS.util.verification.exactU(self.hamiltonian.HCoefs, self.hamiltonian.HTuples, 1)
 
         print(np.linalg.norm(U_exact - U_cartan))
         
