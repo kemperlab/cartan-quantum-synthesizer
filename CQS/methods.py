@@ -624,8 +624,8 @@ class FindParameters:
         
         Args:
             cartan (Obj Cartan): The Cartan object containing the k,h, and Hamiltonian information
-            saveFileName (String, default=None): path to save the output.
-            loadFileName (String, default=None): path to a csv containing previous optimizer results
+            saveFileName (String, default=None): path to save the output. Do not include an extension ('csv' or 'txt')
+            loadFileName (String, default=None): path to a csv containing previous optimizer results. Do not add .csv or .txt
             optimizer (String, default='BFGS'): The Scipy optimizer to use. Easy to add new ones, but must be done manually
                 
                 Options: 
@@ -649,11 +649,15 @@ class FindParameters:
         self.steps = steps
         #Begin Optimizer
         if loadfileName is not None: #If able to, loads prior results
+            #with open(loadfileName + '.csv', "r") as f:
+            #    csv_reader = csv.reader(csv_file, delimiter=',')
             raise Exception('Unable to continue, file loading is not implemented')
+
         else:   
             if saveFileName is not None:
                 if not os.access(saveFileName, os.W_OK): #Verifies write permission
                     raise Exception('Save File location does not have write access. Aborting Optimization.')
+                self.saveFileName = saveFileName
             
             #Generating reused values before begining the optimizer loop
             self.setCommutatorTables() #Sets values for a look-up table for the commutators
@@ -683,8 +687,12 @@ class FindParameters:
 
             self.sethVecFromk()
             self.error = self.errorhVec()
-        print('Optimization Error:')
-        print(self.error)
+
+            print('Optimization Error:')
+            print(self.error)
+
+            if saveFileName is not None:
+                self.saveKH()
 
     def setCommutatorTables(self):
         """ 
@@ -727,7 +735,6 @@ class FindParameters:
                         if res[1] == g_tuples[q]:
                             self.comm_table[i][j] = q
     
-    
     def generateIndexLists(self):
         """Generates a lists for H, h, and k using indices in g instead of as lists of Tuples"""
 
@@ -757,7 +764,6 @@ class FindParameters:
                     self.hElementIndices.append(j)
                     break
 
-    
     def optimize(self):
         """
         Chooses between methods of optimization. Current options are 'BFGS' and 'Powell' from scipy.optimize
@@ -774,7 +780,6 @@ class FindParameters:
             optimiumReturn = scipy.optimize.minimize(self.CostFunction,initialGuess, method='Powell',options={'disp':True, 'ftol':self.accuracy, 'maxiter':self.steps})
         self.kCoefs = optimiumReturn.x
         return optimiumReturn
-
 
     def generalCostFunction(self, thetas1, thetas2, index):
         '''
@@ -837,7 +842,6 @@ class FindParameters:
 
         return result
 
-        
     def gradCostFunction(self, thetas):
         '''
         returns gradient of funky. Order of derivatives is the order of the parameters thetas.
@@ -925,7 +929,6 @@ class FindParameters:
                 self.hCoefs.append(0)
         self.hTuples = self.cartan.h
         
-    
     def errorhVec(self):
         '''Gets the norm square of the part in hcoefs•htuples that is orthogonal to Cartan subalgebra h.
         '''
@@ -970,8 +973,7 @@ class FindParameters:
                     csize = csize + 1
         
         return C, tuplesC
-
-
+    
     def multiplyPauliString(self,a,tupleA,b,tupleB):
         """Computes the multiplication of two Pauli Strings representated as a tuple
 
@@ -1011,8 +1013,6 @@ class FindParameters:
         c = a * b * sign
         return c, tupleC  
     
-
-
     def commutatePauliString(self,a,tupleA,b,tupleB):
         """Computes the commutator of two Pauli Strings representated as a tuple
 
@@ -1105,4 +1105,21 @@ class FindParameters:
         U_exact = CQS.util.verification.exactU(self.hamiltonian.HCoefs, self.hamiltonian.HTuples, 1)
 
         print(np.linalg.norm(U_exact - U_cartan))
+    
+    def saveKH(self):
+        """
+        Saves the information about the otimization to a .csv file
+        """
+        #Format: 
+        #'h '              'hCoefs'           'k'        'kCoefs'
+        # Tuple              Float           Tuple        Float
+        fileNameCSV = self.saveFileName + '.csv'
+        #Converts the formatting
+        solutionList = [['h', 'hCoefs', 'k', 'kCoefs']]
+        for (h, hCo, k, kCoefs) in zip(self.hTuples, self.hCoefs, self.cartan.k, self.kCoefs):
+            solutionList.append([h, hCo, k, kCoefs])
+        with open( fileNameCSV, "w", newline='') as f:
+                writer = csv.writer(f)
+                writer.writerows(solutionList)
+        f.close()
         
