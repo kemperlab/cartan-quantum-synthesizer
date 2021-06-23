@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 __docformat__ = 'google'
-'''import sys
-sys.path.append('c:\\Users\\Thoma\\OneDrive\\Documents\\2021_ORNL\\CartanCodeGit\\cartan-quantum-synthesizer')
-#print(sys.path)'''
 from CQS.methods import Hamiltonian, Cartan, FindParameters
 
 import numpy as np

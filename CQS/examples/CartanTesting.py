@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 __docformat__ = 'google'
-'''import sys
-sys.path.append('c:\\Users\\Thoma\\OneDrive\\Documents\\2021_ORNL\\CartanCodeGit\\cartan-quantum-synthesizer')
-print(sys.path)'''
-
 from CQS.methods import Cartan, Hamiltonian
 
 xy = Hamiltonian(4,[(1,'xy')])
