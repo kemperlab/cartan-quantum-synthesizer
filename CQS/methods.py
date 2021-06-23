@@ -111,7 +111,7 @@ class Hamiltonian:
                     self.HTuples.append(pauliString)
                     self.HCoefs.append(coefficient)
         else:
-            hamiltonianTerms = self.generateHamiltonian(pair[1]) #pair[1] = modelname, pair[2] = boundary condition
+            hamiltonianTerms = self.generateHamiltonian(pair[1]) #pair[1] = modelname,
             if isinstance(pair[0], list): #pair[0] = coefficients float or list
                 if len(pair[0]) != len(hamiltonianTerms):
                      raise ValueError("Coefficient List mismatch: Expected {} coefficients".format(len(hamiltonianTerms)))
