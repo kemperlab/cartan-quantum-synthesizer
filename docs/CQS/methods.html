@@ -43,6 +43,9 @@
                                 <a class="function" href="#Hamiltonian.addTerms">addTerms</a>
                         </li>
                         <li>
+                                <a class="function" href="#Hamiltonian.removeTerm">removeTerm</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#Hamiltonian.generateHamiltonian">generateHamiltonian</a>
                         </li>
                         <li>
@@ -129,6 +132,9 @@
                         <li>
                                 <a class="function" href="#FindParameters.printResult">printResult</a>
                         </li>
+                        <li>
+                                <a class="function" href="#FindParameters.saveKH">saveKH</a>
+                        </li>
                 </ul>
 
             </li>
@@ -165,6 +171,7 @@
 <span class="kn">from</span> <span class="nn">CQS.util.PauliOps</span> <span class="kn">import</span> <span class="n">commutatePauliString</span>
 <span class="kn">import</span> <span class="nn">CQS.util.IO</span> <span class="k">as</span> <span class="nn">IO</span>
 <span class="kn">from</span> <span class="nn">CQS.util.IO</span> <span class="kn">import</span> <span class="n">printlist</span><span class="p">,</span> <span class="n">paulilabel</span>
+<span class="kn">import</span> <span class="nn">CQS.util.verification</span>
 
 
 <span class="n">RULES</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
@@ -305,7 +312,15 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">HTuples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pairs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">HCoefs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pairs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
+    <span class="k">def</span> <span class="nf">removeTerm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tup</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Removes the term matching the tuple input. Used for trimming terms off the Hamiltonian</span>
 
+<span class="sd">        Args:</span>
+<span class="sd">            tup (tuple): A (pauliString)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">HTuples</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">tup</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">HTuples</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">HCoefs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">generateHamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelType</span><span class="p">,</span> <span class="n">closed</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Helper Function to generate Hamiltonians.</span>
@@ -486,6 +501,7 @@
             <span class="k">return</span> <span class="n">returnlist</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid Type: Must be &quot;tuples&quot;, &quot;printTuples&quot;, &quot;printText&quot;, or &quot;text&quot;&#39;</span><span class="p">)</span>
+
 <span class="k">class</span> <span class="nc">Cartan</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class to contain the options for performing Cartan Decomposition on a Hamiltonian</span>
@@ -536,6 +552,11 @@
     <span class="k">def</span> <span class="nf">decompose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">involutionName</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets a new Involution using a switch. Regenerates h using the default first element in m</span>
+
+<span class="sd">        Options:</span>
+<span class="sd">                * `&#39;evenOdd&#39;`: m contains an even number of non-identity pauli terms in each string, k contains an odd nunber of non-idenity elements</span>
+<span class="sd">                * `&#39;knejaGlaser&#39;`: m contains elements ending in Y or X, k contains elements ending in I or Z</span>
+<span class="sd">                * `&#39;count&#39; + &#39;X&#39;, &#39;Y&#39;, or &#39;Z&#39;`: Counts of the number of the specified Pauli Tuple. Even count in m, odd in k</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">involution</span> <span class="o">=</span> <span class="n">involutionName</span> <span class="c1">#Store involution name</span>
 
@@ -547,7 +568,22 @@
             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elemcount</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">involutionName</span> <span class="o">==</span> <span class="s1">&#39;countY&#39;</span><span class="p">:</span>
             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elemcount</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">involutionName</span> <span class="o">==</span> <span class="s1">&#39;countZ&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elemcount</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">involutionName</span> <span class="o">==</span> <span class="s1">&#39;countZ&#39;</span><span class="p">:</span> 
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elemcount</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">==</span> <span class="p">[]</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">==</span> <span class="p">[]):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+            
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+            <span class="k">try</span><span class="p">:</span> 
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Involution Failure&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">subAlgebra</span><span class="p">()</span>
 
@@ -710,7 +746,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">h</span>
         <span class="c1">#Regenerates the ordering for g, required to generate commutators</span>
 
-        <span class="n">m_tuples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span>
+        <span class="n">m_tuples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="c1">#Strips h from m</span>
         <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">m_tuples</span><span class="p">):</span> <span class="c1">#</span>
@@ -722,7 +758,8 @@
                     <span class="k">break</span>
             <span class="k">if</span> <span class="n">flag</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">index</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="c1">#Reorder g</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">+</span> <span class="n">m_tuples</span> <span class="c1">#Reorder g</span>
+
 <span class="k">class</span> <span class="nc">FindParameters</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    From a Cartan Decomposition, runs the optimizer to find the appropriate parameters for a circuit</span>
@@ -745,8 +782,8 @@
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            cartan (Obj Cartan): The Cartan object containing the k,h, and Hamiltonian information</span>
-<span class="sd">            saveFileName (String, default=None): path to save the output.</span>
-<span class="sd">            loadFileName (String, default=None): path to a csv containing previous optimizer results</span>
+<span class="sd">            saveFileName (String, default=None): path to save the output. Do not include an extension (&#39;csv&#39; or &#39;txt&#39;)</span>
+<span class="sd">            loadFileName (String, default=None): path to a csv containing previous optimizer results. Do not add .csv or .txt</span>
 <span class="sd">            optimizer (String, default=&#39;BFGS&#39;): The Scipy optimizer to use. Easy to add new ones, but must be done manually</span>
 <span class="sd">                </span>
 <span class="sd">                Options: </span>
@@ -770,11 +807,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">steps</span> <span class="o">=</span> <span class="n">steps</span>
         <span class="c1">#Begin Optimizer</span>
         <span class="k">if</span> <span class="n">loadfileName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">#If able to, loads prior results</span>
+            <span class="c1">#with open(loadfileName + &#39;.csv&#39;, &quot;r&quot;) as f:</span>
+            <span class="c1">#    csv_reader = csv.reader(csv_file, delimiter=&#39;,&#39;)</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Unable to continue, file loading is not implemented&#39;</span><span class="p">)</span>
+
         <span class="k">else</span><span class="p">:</span>   
             <span class="k">if</span> <span class="n">saveFileName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">saveFileName</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">W_OK</span><span class="p">):</span> <span class="c1">#Verifies write permission</span>
                     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Save File location does not have write access. Aborting Optimization.&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">saveFileName</span> <span class="o">=</span> <span class="n">saveFileName</span>
             
             <span class="c1">#Generating reused values before begining the optimizer loop</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">setCommutatorTables</span><span class="p">()</span> <span class="c1">#Sets values for a look-up table for the commutators</span>
@@ -804,8 +845,12 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">sethVecFromk</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">errorhVec</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Optimization Error:&#39;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Optimization Error:&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">saveFileName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">saveKH</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">setCommutatorTables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; </span>
@@ -848,7 +893,6 @@
                         <span class="k">if</span> <span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">g_tuples</span><span class="p">[</span><span class="n">q</span><span class="p">]:</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">comm_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span>
     
-    
     <span class="k">def</span> <span class="nf">generateIndexLists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generates a lists for H, h, and k using indices in g instead of as lists of Tuples&quot;&quot;&quot;</span>
 
@@ -878,7 +922,6 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">hElementIndices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
                     <span class="k">break</span>
 
-    
     <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Chooses between methods of optimization. Current options are &#39;BFGS&#39; and &#39;Powell&#39; from scipy.optimize</span>
@@ -895,7 +938,6 @@
             <span class="n">optimiumReturn</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CostFunction</span><span class="p">,</span><span class="n">initialGuess</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;Powell&#39;</span><span class="p">,</span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;disp&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;ftol&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">accuracy</span><span class="p">,</span> <span class="s1">&#39;maxiter&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">})</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kCoefs</span> <span class="o">=</span> <span class="n">optimiumReturn</span><span class="o">.</span><span class="n">x</span>
         <span class="k">return</span> <span class="n">optimiumReturn</span>
-
 
     <span class="k">def</span> <span class="nf">generalCostFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thetas1</span><span class="p">,</span> <span class="n">thetas2</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -958,7 +1000,6 @@
 
         <span class="k">return</span> <span class="n">result</span>
 
-        
     <span class="k">def</span> <span class="nf">gradCostFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thetas</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        returns gradient of funky. Order of derivatives is the order of the parameters thetas.</span>
@@ -1046,7 +1087,6 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">hCoefs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hTuples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">h</span>
         
-    
     <span class="k">def</span> <span class="nf">errorhVec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Gets the norm square of the part in hcoefs•htuples that is orthogonal to Cartan subalgebra h.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -1091,8 +1131,7 @@
                     <span class="n">csize</span> <span class="o">=</span> <span class="n">csize</span> <span class="o">+</span> <span class="mi">1</span>
         
         <span class="k">return</span> <span class="n">C</span><span class="p">,</span> <span class="n">tuplesC</span>
-
-
+    
     <span class="k">def</span> <span class="nf">multiplyPauliString</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">tupleA</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">tupleB</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes the multiplication of two Pauli Strings representated as a tuple</span>
 
@@ -1132,8 +1171,6 @@
         <span class="n">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span> <span class="o">*</span> <span class="n">sign</span>
         <span class="k">return</span> <span class="n">c</span><span class="p">,</span> <span class="n">tupleC</span>  
     
-
-
     <span class="k">def</span> <span class="nf">commutatePauliString</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">tupleA</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">tupleB</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes the commutator of two Pauli Strings representated as a tuple</span>
 
@@ -1220,6 +1257,29 @@
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> h elements: </span><span class="se">\n</span><span class="s1"> &#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">co</span><span class="p">,</span> <span class="n">tup</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hCoefs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">h</span><span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">co</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;*&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">IO</span><span class="o">.</span><span class="n">paulilabel</span><span class="p">(</span><span class="n">tup</span><span class="p">)))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Normed Error |KHK - Exact|:&#39;</span><span class="p">)</span>
+        <span class="n">U_cartan</span> <span class="o">=</span> <span class="n">CQS</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">verification</span><span class="o">.</span><span class="n">KHK</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kCoefs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hCoefs</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>
+
+        <span class="n">U_exact</span> <span class="o">=</span> <span class="n">CQS</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">verification</span><span class="o">.</span><span class="n">exactU</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hamiltonian</span><span class="o">.</span><span class="n">HCoefs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hamiltonian</span><span class="o">.</span><span class="n">HTuples</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">U_exact</span> <span class="o">-</span> <span class="n">U_cartan</span><span class="p">))</span>
+    
+    <span class="k">def</span> <span class="nf">saveKH</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves the information about the otimization to a .csv file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#Format: </span>
+        <span class="c1">#&#39;h &#39;              &#39;hCoefs&#39;           &#39;k&#39;        &#39;kCoefs&#39;</span>
+        <span class="c1"># Tuple              Float           Tuple        Float</span>
+        <span class="n">fileNameCSV</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveFileName</span> <span class="o">+</span> <span class="s1">&#39;.csv&#39;</span>
+        <span class="c1">#Converts the formatting</span>
+        <span class="n">solutionList</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="s1">&#39;hCoefs&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="s1">&#39;kCoefs&#39;</span><span class="p">]]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">hCo</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kCoefs</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hTuples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hCoefs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kCoefs</span><span class="p">):</span>
+            <span class="n">solutionList</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">h</span><span class="p">,</span> <span class="n">hCo</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kCoefs</span><span class="p">])</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span> <span class="n">fileNameCSV</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">solutionList</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         
 </pre></div>
 
@@ -1367,7 +1427,15 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">HTuples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pairs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">HCoefs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pairs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
+    <span class="k">def</span> <span class="nf">removeTerm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tup</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Removes the term matching the tuple input. Used for trimming terms off the Hamiltonian</span>
 
+<span class="sd">        Args:</span>
+<span class="sd">            tup (tuple): A (pauliString)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">HTuples</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">tup</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">HTuples</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">HCoefs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">generateHamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelType</span><span class="p">,</span> <span class="n">closed</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Helper Function to generate Hamiltonians.</span>
@@ -1823,6 +1891,40 @@
 
 
                             </div>
+                            <div id="Hamiltonian.removeTerm" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Hamiltonian.removeTerm">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">removeTerm</span><span class="signature">(self, tup)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">removeTerm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tup</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Removes the term matching the tuple input. Used for trimming terms off the Hamiltonian</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tup (tuple): A (pauliString)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">HTuples</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">tup</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">HTuples</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">HCoefs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Removes the term matching the tuple input. Used for trimming terms off the Hamiltonian</p>
+
+<h6 id="args">Args</h6>
+
+<ul>
+<li><strong>tup (tuple):</strong>  A (pauliString)</li>
+</ul>
+</div>
+
+
+                            </div>
                             <div id="Hamiltonian.generateHamiltonian" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#Hamiltonian.generateHamiltonian">#&nbsp;&nbsp</a>
 
@@ -2132,6 +2234,11 @@
     <span class="k">def</span> <span class="nf">decompose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">involutionName</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets a new Involution using a switch. Regenerates h using the default first element in m</span>
+
+<span class="sd">        Options:</span>
+<span class="sd">                * `&#39;evenOdd&#39;`: m contains an even number of non-identity pauli terms in each string, k contains an odd nunber of non-idenity elements</span>
+<span class="sd">                * `&#39;knejaGlaser&#39;`: m contains elements ending in Y or X, k contains elements ending in I or Z</span>
+<span class="sd">                * `&#39;count&#39; + &#39;X&#39;, &#39;Y&#39;, or &#39;Z&#39;`: Counts of the number of the specified Pauli Tuple. Even count in m, odd in k</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">involution</span> <span class="o">=</span> <span class="n">involutionName</span> <span class="c1">#Store involution name</span>
 
@@ -2143,7 +2250,22 @@
             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elemcount</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">involutionName</span> <span class="o">==</span> <span class="s1">&#39;countY&#39;</span><span class="p">:</span>
             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elemcount</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">involutionName</span> <span class="o">==</span> <span class="s1">&#39;countZ&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elemcount</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">involutionName</span> <span class="o">==</span> <span class="s1">&#39;countZ&#39;</span><span class="p">:</span> 
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elemcount</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">==</span> <span class="p">[]</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">==</span> <span class="p">[]):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+            
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+            <span class="k">try</span><span class="p">:</span> 
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Involution Failure&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">subAlgebra</span><span class="p">()</span>
 
@@ -2306,7 +2428,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">h</span>
         <span class="c1">#Regenerates the ordering for g, required to generate commutators</span>
 
-        <span class="n">m_tuples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span>
+        <span class="n">m_tuples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="c1">#Strips h from m</span>
         <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">m_tuples</span><span class="p">):</span> <span class="c1">#</span>
@@ -2318,7 +2440,7 @@
                     <span class="k">break</span>
             <span class="k">if</span> <span class="n">flag</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">index</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="c1">#Reorder g</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">+</span> <span class="n">m_tuples</span> <span class="c1">#Reorder g</span>
 </pre></div>
 
         </details>
@@ -2434,6 +2556,11 @@
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">decompose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">involutionName</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets a new Involution using a switch. Regenerates h using the default first element in m</span>
+
+<span class="sd">        Options:</span>
+<span class="sd">                * `&#39;evenOdd&#39;`: m contains an even number of non-identity pauli terms in each string, k contains an odd nunber of non-idenity elements</span>
+<span class="sd">                * `&#39;knejaGlaser&#39;`: m contains elements ending in Y or X, k contains elements ending in I or Z</span>
+<span class="sd">                * `&#39;count&#39; + &#39;X&#39;, &#39;Y&#39;, or &#39;Z&#39;`: Counts of the number of the specified Pauli Tuple. Even count in m, odd in k</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">involution</span> <span class="o">=</span> <span class="n">involutionName</span> <span class="c1">#Store involution name</span>
 
@@ -2445,7 +2572,22 @@
             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elemcount</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">involutionName</span> <span class="o">==</span> <span class="s1">&#39;countY&#39;</span><span class="p">:</span>
             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elemcount</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">involutionName</span> <span class="o">==</span> <span class="s1">&#39;countZ&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elemcount</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">involutionName</span> <span class="o">==</span> <span class="s1">&#39;countZ&#39;</span><span class="p">:</span> 
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elemcount</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">==</span> <span class="p">[]</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">==</span> <span class="p">[]):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+            
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+            <span class="k">try</span><span class="p">:</span> 
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Involution Failure&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">subAlgebra</span><span class="p">()</span>
 </pre></div>
@@ -2453,6 +2595,16 @@
         </details>
 
             <div class="docstring"><p>Sets a new Involution using a switch. Regenerates h using the default first element in m</p>
+
+<h6 id="options">Options</h6>
+
+<blockquote>
+  <ul>
+  <li><code>'evenOdd'</code>: m contains an even number of non-identity pauli terms in each string, k contains an odd nunber of non-idenity elements</li>
+  <li><code>'knejaGlaser'</code>: m contains elements ending in Y or X, k contains elements ending in I or Z</li>
+  <li><code>'count' + 'X', 'Y', or 'Z'</code>: Counts of the number of the specified Pauli Tuple. Even count in m, odd in k</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -2753,7 +2905,7 @@ It corresponds to       heta(g) = III...IZ g III..IZ</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">h</span>
         <span class="c1">#Regenerates the ordering for g, required to generate commutators</span>
 
-        <span class="n">m_tuples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span>
+        <span class="n">m_tuples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="c1">#Strips h from m</span>
         <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">m_tuples</span><span class="p">):</span> <span class="c1">#</span>
@@ -2765,7 +2917,7 @@ It corresponds to       heta(g) = III...IZ g III..IZ</p>
                     <span class="k">break</span>
             <span class="k">if</span> <span class="n">flag</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">index</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="c1">#Reorder g</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">+</span> <span class="n">m_tuples</span> <span class="c1">#Reorder g</span>
 </pre></div>
 
         </details>
@@ -2821,8 +2973,8 @@ It corresponds to       heta(g) = III...IZ g III..IZ</p>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            cartan (Obj Cartan): The Cartan object containing the k,h, and Hamiltonian information</span>
-<span class="sd">            saveFileName (String, default=None): path to save the output.</span>
-<span class="sd">            loadFileName (String, default=None): path to a csv containing previous optimizer results</span>
+<span class="sd">            saveFileName (String, default=None): path to save the output. Do not include an extension (&#39;csv&#39; or &#39;txt&#39;)</span>
+<span class="sd">            loadFileName (String, default=None): path to a csv containing previous optimizer results. Do not add .csv or .txt</span>
 <span class="sd">            optimizer (String, default=&#39;BFGS&#39;): The Scipy optimizer to use. Easy to add new ones, but must be done manually</span>
 <span class="sd">                </span>
 <span class="sd">                Options: </span>
@@ -2846,11 +2998,15 @@ It corresponds to       heta(g) = III...IZ g III..IZ</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">steps</span> <span class="o">=</span> <span class="n">steps</span>
         <span class="c1">#Begin Optimizer</span>
         <span class="k">if</span> <span class="n">loadfileName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">#If able to, loads prior results</span>
+            <span class="c1">#with open(loadfileName + &#39;.csv&#39;, &quot;r&quot;) as f:</span>
+            <span class="c1">#    csv_reader = csv.reader(csv_file, delimiter=&#39;,&#39;)</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Unable to continue, file loading is not implemented&#39;</span><span class="p">)</span>
+
         <span class="k">else</span><span class="p">:</span>   
             <span class="k">if</span> <span class="n">saveFileName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">saveFileName</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">W_OK</span><span class="p">):</span> <span class="c1">#Verifies write permission</span>
                     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Save File location does not have write access. Aborting Optimization.&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">saveFileName</span> <span class="o">=</span> <span class="n">saveFileName</span>
             
             <span class="c1">#Generating reused values before begining the optimizer loop</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">setCommutatorTables</span><span class="p">()</span> <span class="c1">#Sets values for a look-up table for the commutators</span>
@@ -2880,8 +3036,12 @@ It corresponds to       heta(g) = III...IZ g III..IZ</p>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">sethVecFromk</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">errorhVec</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Optimization Error:&#39;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Optimization Error:&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">saveFileName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">saveKH</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">setCommutatorTables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; </span>
@@ -2924,7 +3084,6 @@ It corresponds to       heta(g) = III...IZ g III..IZ</p>
                         <span class="k">if</span> <span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">g_tuples</span><span class="p">[</span><span class="n">q</span><span class="p">]:</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">comm_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span>
     
-    
     <span class="k">def</span> <span class="nf">generateIndexLists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generates a lists for H, h, and k using indices in g instead of as lists of Tuples&quot;&quot;&quot;</span>
 
@@ -2954,7 +3113,6 @@ It corresponds to       heta(g) = III...IZ g III..IZ</p>
                     <span class="bp">self</span><span class="o">.</span><span class="n">hElementIndices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
                     <span class="k">break</span>
 
-    
     <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Chooses between methods of optimization. Current options are &#39;BFGS&#39; and &#39;Powell&#39; from scipy.optimize</span>
@@ -2971,7 +3129,6 @@ It corresponds to       heta(g) = III...IZ g III..IZ</p>
             <span class="n">optimiumReturn</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CostFunction</span><span class="p">,</span><span class="n">initialGuess</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;Powell&#39;</span><span class="p">,</span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;disp&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;ftol&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">accuracy</span><span class="p">,</span> <span class="s1">&#39;maxiter&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">})</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kCoefs</span> <span class="o">=</span> <span class="n">optimiumReturn</span><span class="o">.</span><span class="n">x</span>
         <span class="k">return</span> <span class="n">optimiumReturn</span>
-
 
     <span class="k">def</span> <span class="nf">generalCostFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thetas1</span><span class="p">,</span> <span class="n">thetas2</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -3034,7 +3191,6 @@ It corresponds to       heta(g) = III...IZ g III..IZ</p>
 
         <span class="k">return</span> <span class="n">result</span>
 
-        
     <span class="k">def</span> <span class="nf">gradCostFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thetas</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        returns gradient of funky. Order of derivatives is the order of the parameters thetas.</span>
@@ -3122,7 +3278,6 @@ It corresponds to       heta(g) = III...IZ g III..IZ</p>
                 <span class="bp">self</span><span class="o">.</span><span class="n">hCoefs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hTuples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">h</span>
         
-    
     <span class="k">def</span> <span class="nf">errorhVec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Gets the norm square of the part in hcoefs•htuples that is orthogonal to Cartan subalgebra h.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -3167,8 +3322,7 @@ It corresponds to       heta(g) = III...IZ g III..IZ</p>
                     <span class="n">csize</span> <span class="o">=</span> <span class="n">csize</span> <span class="o">+</span> <span class="mi">1</span>
         
         <span class="k">return</span> <span class="n">C</span><span class="p">,</span> <span class="n">tuplesC</span>
-
-
+    
     <span class="k">def</span> <span class="nf">multiplyPauliString</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">tupleA</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">tupleB</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes the multiplication of two Pauli Strings representated as a tuple</span>
 
@@ -3208,8 +3362,6 @@ It corresponds to       heta(g) = III...IZ g III..IZ</p>
         <span class="n">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span> <span class="o">*</span> <span class="n">sign</span>
         <span class="k">return</span> <span class="n">c</span><span class="p">,</span> <span class="n">tupleC</span>  
     
-
-
     <span class="k">def</span> <span class="nf">commutatePauliString</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">tupleA</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">tupleB</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes the commutator of two Pauli Strings representated as a tuple</span>
 
@@ -3296,6 +3448,29 @@ It corresponds to       heta(g) = III...IZ g III..IZ</p>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> h elements: </span><span class="se">\n</span><span class="s1"> &#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">co</span><span class="p">,</span> <span class="n">tup</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hCoefs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">h</span><span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">co</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;*&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">IO</span><span class="o">.</span><span class="n">paulilabel</span><span class="p">(</span><span class="n">tup</span><span class="p">)))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Normed Error |KHK - Exact|:&#39;</span><span class="p">)</span>
+        <span class="n">U_cartan</span> <span class="o">=</span> <span class="n">CQS</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">verification</span><span class="o">.</span><span class="n">KHK</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kCoefs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hCoefs</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>
+
+        <span class="n">U_exact</span> <span class="o">=</span> <span class="n">CQS</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">verification</span><span class="o">.</span><span class="n">exactU</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hamiltonian</span><span class="o">.</span><span class="n">HCoefs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hamiltonian</span><span class="o">.</span><span class="n">HTuples</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">U_exact</span> <span class="o">-</span> <span class="n">U_cartan</span><span class="p">))</span>
+    
+    <span class="k">def</span> <span class="nf">saveKH</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves the information about the otimization to a .csv file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#Format: </span>
+        <span class="c1">#&#39;h &#39;              &#39;hCoefs&#39;           &#39;k&#39;        &#39;kCoefs&#39;</span>
+        <span class="c1"># Tuple              Float           Tuple        Float</span>
+        <span class="n">fileNameCSV</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveFileName</span> <span class="o">+</span> <span class="s1">&#39;.csv&#39;</span>
+        <span class="c1">#Converts the formatting</span>
+        <span class="n">solutionList</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="s1">&#39;hCoefs&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="s1">&#39;kCoefs&#39;</span><span class="p">]]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">hCo</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kCoefs</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hTuples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hCoefs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kCoefs</span><span class="p">):</span>
+            <span class="n">solutionList</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">h</span><span class="p">,</span> <span class="n">hCo</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kCoefs</span><span class="p">])</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span> <span class="n">fileNameCSV</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">solutionList</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 
         </details>
@@ -3342,8 +3517,8 @@ It corresponds to       heta(g) = III...IZ g III..IZ</p>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            cartan (Obj Cartan): The Cartan object containing the k,h, and Hamiltonian information</span>
-<span class="sd">            saveFileName (String, default=None): path to save the output.</span>
-<span class="sd">            loadFileName (String, default=None): path to a csv containing previous optimizer results</span>
+<span class="sd">            saveFileName (String, default=None): path to save the output. Do not include an extension (&#39;csv&#39; or &#39;txt&#39;)</span>
+<span class="sd">            loadFileName (String, default=None): path to a csv containing previous optimizer results. Do not add .csv or .txt</span>
 <span class="sd">            optimizer (String, default=&#39;BFGS&#39;): The Scipy optimizer to use. Easy to add new ones, but must be done manually</span>
 <span class="sd">                </span>
 <span class="sd">                Options: </span>
@@ -3367,11 +3542,15 @@ It corresponds to       heta(g) = III...IZ g III..IZ</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">steps</span> <span class="o">=</span> <span class="n">steps</span>
         <span class="c1">#Begin Optimizer</span>
         <span class="k">if</span> <span class="n">loadfileName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">#If able to, loads prior results</span>
+            <span class="c1">#with open(loadfileName + &#39;.csv&#39;, &quot;r&quot;) as f:</span>
+            <span class="c1">#    csv_reader = csv.reader(csv_file, delimiter=&#39;,&#39;)</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Unable to continue, file loading is not implemented&#39;</span><span class="p">)</span>
+
         <span class="k">else</span><span class="p">:</span>   
             <span class="k">if</span> <span class="n">saveFileName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">saveFileName</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">W_OK</span><span class="p">):</span> <span class="c1">#Verifies write permission</span>
                     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Save File location does not have write access. Aborting Optimization.&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">saveFileName</span> <span class="o">=</span> <span class="n">saveFileName</span>
             
             <span class="c1">#Generating reused values before begining the optimizer loop</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">setCommutatorTables</span><span class="p">()</span> <span class="c1">#Sets values for a look-up table for the commutators</span>
@@ -3401,8 +3580,12 @@ It corresponds to       heta(g) = III...IZ g III..IZ</p>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">sethVecFromk</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">errorhVec</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Optimization Error:&#39;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Optimization Error:&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">saveFileName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">saveKH</span><span class="p">()</span>
 </pre></div>
 
         </details>
@@ -3424,8 +3607,8 @@ If loadFileName is provided, does not run the optimizer and instead reads data f
 
 <ul>
 <li><strong>cartan (Obj Cartan):</strong>  The Cartan object containing the k,h, and Hamiltonian information</li>
-<li><strong>saveFileName (String, default=None):</strong>  path to save the output.</li>
-<li><strong>loadFileName (String, default=None):</strong>  path to a csv containing previous optimizer results</li>
+<li><strong>saveFileName (String, default=None):</strong>  path to save the output. Do not include an extension ('csv' or 'txt')</li>
+<li><strong>loadFileName (String, default=None):</strong>  path to a csv containing previous optimizer results. Do not add .csv or .txt</li>
 <li><p><strong>optimizer (String, default='BFGS'):</strong>  The Scipy optimizer to use. Easy to add new ones, but must be done manually</p>
 
 <p>Options: </p>
@@ -4182,11 +4365,52 @@ Also known as the Adjoint Representation</p>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> h elements: </span><span class="se">\n</span><span class="s1"> &#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">co</span><span class="p">,</span> <span class="n">tup</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hCoefs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">h</span><span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">co</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;*&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">IO</span><span class="o">.</span><span class="n">paulilabel</span><span class="p">(</span><span class="n">tup</span><span class="p">)))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Normed Error |KHK - Exact|:&#39;</span><span class="p">)</span>
+        <span class="n">U_cartan</span> <span class="o">=</span> <span class="n">CQS</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">verification</span><span class="o">.</span><span class="n">KHK</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kCoefs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hCoefs</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>
+
+        <span class="n">U_exact</span> <span class="o">=</span> <span class="n">CQS</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">verification</span><span class="o">.</span><span class="n">exactU</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hamiltonian</span><span class="o">.</span><span class="n">HCoefs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hamiltonian</span><span class="o">.</span><span class="n">HTuples</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">U_exact</span> <span class="o">-</span> <span class="n">U_cartan</span><span class="p">))</span>
 </pre></div>
 
         </details>
 
             <div class="docstring"><p>Prints out the results of the otpimization</p>
+</div>
+
+
+                            </div>
+                            <div id="FindParameters.saveKH" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#FindParameters.saveKH">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">saveKH</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">saveKH</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves the information about the otimization to a .csv file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#Format: </span>
+        <span class="c1">#&#39;h &#39;              &#39;hCoefs&#39;           &#39;k&#39;        &#39;kCoefs&#39;</span>
+        <span class="c1"># Tuple              Float           Tuple        Float</span>
+        <span class="n">fileNameCSV</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveFileName</span> <span class="o">+</span> <span class="s1">&#39;.csv&#39;</span>
+        <span class="c1">#Converts the formatting</span>
+        <span class="n">solutionList</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="s1">&#39;hCoefs&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="s1">&#39;kCoefs&#39;</span><span class="p">]]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">hCo</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kCoefs</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hTuples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hCoefs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartan</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kCoefs</span><span class="p">):</span>
+            <span class="n">solutionList</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">h</span><span class="p">,</span> <span class="n">hCo</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kCoefs</span><span class="p">])</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span> <span class="n">fileNameCSV</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">solutionList</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Saves the information about the otimization to a .csv file</p>
 </div>
 
 

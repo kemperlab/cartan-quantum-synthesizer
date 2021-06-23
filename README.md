@@ -45,17 +45,16 @@ The functionality is based on three object classes:
 For example, to use these objects to generate the decomposition for the time evolution of the four site 1D lattice XY model, the code would be as follows:
 
 ## Installation:
-from the folder `.\CQS\` run:
-
-`python setup.py install`
+To install the functions as a package, the easiest method is to run:
+`python -m pip install -e /path/to/cartan-quantum-synthesizer`
 
 This will install the package. You can now import the key objects using 
 
-`from methods import *`
+`from CQS.methods import *`
 
 which is equivalent to 
 
-`from methods import Hamiltonian, Cartan, FindParameters`
+`from CQS.methods import Hamiltonian, Cartan, FindParameters`
 
 
 ## Define the parameters of the model:
@@ -88,10 +87,26 @@ The default Involution is Even-Odd, which counts the number of X and Y terms in 
 `xyP.printResult()`
 
 # Additional Options:
-TODO
+## Hamiltonian:
+The Hamiltonian objects accepts model names as:
+<ol>
+  <li>A List of Tuples formatted as: <code>(coefficient, 'nameOfModel', periodicboundaryCondition)</code> where the periodicBoundaryCondition is optional and defaults to False. </li>
+  <li>A List containing Tuples formatted as in method 1, except containing a list of coefficients matching the length and indexing of the 'modelName' Hamiltonian. It is possible to run the method first using a dummy coefficient to determine the order for formatting</li>
+</ol>
+These rely on the existing hamiltonian methods, and can be called by defining name= when initializing the Hamiltonian object or when calling Hamiltonian.addModel()
+
+Alternatively, and for more general use cases, users can add their own coefficient, tuple pairs. This can be passed to the method Hamiltonian.addTerms() as:
+<ol>
+  <li>A List of Tuples each containing <code>(Coefficient, PauliString)</code>Where the Pauli String is formatted as a Tuple</li>
+  <li>A single Tuple formatted as above to add a single term</li>
+  <li>A single tuple containing two Lists: One for the coefficients, one for the (PauliStrings) formatted as Tuples</li>
+</ol>
+
+## Cartan:
+The main methods that might be useful in Cartan are <code>Cartan.decompose()</code> and <code>Cartan.subAlgebra()</code>. decompose allows users to specify one of the Cartan Involutions by passing the name. The default option is EvenOdd, which might not be the best for all models. 'CountY' is generally very useful. subAlgebra allows users to pass a set of (pauliStrings), which must commute and exist in m, to be the basis for the Cartan Subalgebra. Generally, the subalgebra is not unique and clever choice of the subalgebra may reduce the circuit size. 
 
 # Current State:
-Version 0.1 - Currently stable, requires some bug fixing. If you find an error in the code, please contact Thomas Steckmann @tmsteckm or Efekan Kokcu
+Version 0.1 - Currently stable, requires some bug fixing. If you find an error in the code, please contact Thomas Steckmann @tmsteck or Efekan Kokcu
 
 ## TODO: 
  * Fix Documentation
