@@ -15,4 +15,4 @@ package.util contains functions useful for generating the above objects or for v
 
 Finally, the examples file provides code for verifying the correctness of the methods and for understanding the usage. 
 """
-#__all__ = ['Hamiltonian','Cartan','FindParameters']
+__all__ = ['Hamiltonian','Cartan','FindParameters']
