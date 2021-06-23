@@ -35,7 +35,13 @@ For example, to use these objects to generate the decomposition for the time evo
 
 ## Installation:
 To install the functions as a package, the easiest method is to run:
-`python -m pip install -e /path/to/cartan-quantum-synthesizer`
+<code>
+  git clone https://github.com/kemperlab/cartan-quantum-synthesizer.git
+  
+  cd ./cartan-quantum-synthesizer/
+  
+  pip install .
+</code>
 
 This will install the package. You can now import the key objects using 
 
