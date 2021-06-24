@@ -797,7 +797,7 @@ class FindParameters:
             resH = self.adj_action(-thetas2[i],self.kElementIndices[i],resH[0],resH[1])
 
         #create identity matrix for this dimensions
-        I = (0,)*len(self.cartan.k[0])
+        I = (0,)*len(self.cartan.h[0])
         
         
         resV = self.multiplyLinCombRound([1],[I],resV[0],resV[1],self.accuracy)  
@@ -890,7 +890,7 @@ class FindParameters:
         hCoefs and hTuples are the results stripped of the components in m
         '''
 
-        I = (0,)*len(self.cartan.k[0])
+        I = (0,)*len(self.cartan.h[0])
         
         res = [self.hamiltonian.HCoefs, self.hamiltonian.HTuples]
         
