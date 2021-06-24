@@ -412,21 +412,6 @@ class Cartan:
             (self.m, self.k) = self.elemcount(self.g, 2)
         elif involutionName == 'countZ': 
             (self.m, self.k) = self.elemcount(self.g, 3)
-
-        if (self.m == [] or self.k == []):
-            try:
-                print(self.m)
-            
-            except:
-                pass
-
-            try: 
-                print(self.k)
-            except:
-                pass
-
-            raise Exception("Involution Failure")
-
         self.subAlgebra()
 
 
