@@ -41,8 +41,11 @@ class Hamiltonian:
     """
     def __init__(self, sites, name = None):
         """Initializes an emtpy Hamiltnoan, unless name is specified
+
+        name is not required as an input to initialize the Hamiltonian, only the number of qubits. After intializing the Hamiltonian, users can use addModel() to add a single, imlemented Hamiltonian at a time and use .addTerms() to add lists of terms or individual terms. .removeTerm() can be used to remove a single term at a time
+
         Args:
-            qubits (int): The number of lattice points the Hamiltonisn svyd on
+            qubits (int): The number of lattice points the Hamiltonian exists on
             name (List of Tuples): Easily build Hamiltonians from native models. 
 
                 ### Options:
@@ -142,25 +145,36 @@ class Hamiltonian:
         """
         if isinstance(pairs, list): #Verifies the User input - if a list, iterates over it
             for pair in pairs:
-                self.HTuples.append(pair[1])
-                self.HCoefs.append(pair[0])
+                try: #Checks if the element is already in the list and adds it
+                    index = self.HTuples.index(pair[1])
+                    self.HCoefs[index] = self.HCoefs[index] + pair[0]
+                except: #If not in the list, catches warning and adds the new term
+                    self.HTuples.append(pair[1])
+                    self.HCoefs.append(pair[0])
         elif isinstance(pairs, tuple): #Verifies user input - if a tuple, just adds it
             if isinstance(pairs[0], list):
-                for i in pairs[0]:
-                    self.HCoefs.append(i)
-                for i in pairs[1]:
-                    self.HTuples.append(i)
+                for (co, tup) in zip (pairs[0], pairs[1]):
+                    try: #Checks if the element is already in the list and adds it
+                        index = self.HTuples.index(tup)
+                        self.HCoefs[index] = self.HCoefs[index] + co
+                    except: #If not in the list, catches warning and adds the new term
+                        self.HTuples.append(tup)
+                        self.HCoefs.append(co)
             else:
-                self.HTuples.append(pairs[1])
-                self.HCoefs.append(pairs[0])
+                try: #Checks if the element is already in the list and adds it
+                    index = self.HTuples.index(pairs[1])
+                    self.HCoefs[index] = self.HCoefs[index] + pairs[0]
+                except: #If not in the list, catches warning and adds the new term
+                    self.HTuples.append(pairs[1])
+                    self.HCoefs.append(pairs[0])
 
     def removeTerm(self, tup):
         """Removes the term matching the tuple input. Used for trimming terms off the Hamiltonian
-
         Args:
             tup (tuple): A (pauliString)
         """
         index = self.HTuples.index(tup)
+        
         self.HTuples.pop(index)
         self.HCoefs.pop(index)
 
