@@ -39,8 +39,6 @@ To install the functions as a package, the easiest method is to run:
 git clone https://code.ornl.gov/k8h/entanglement_metric.git
 cd entanglement_metric
 pip install .
-
-
 ```
 
 This will install the package. You can now import the key objects using 
