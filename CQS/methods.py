@@ -379,7 +379,7 @@ class Cartan:
     * Seed choice of h
     * Modify k (Additional Decomposition, TODO: Abelian Decomposition, Piling)
     """
-    def __init__(self, hamObj, involution='evenOdd', order = 0):
+    def __init__(self, hamObj, involution='evenOdd', order = 0, manualMode=0):
         """ Generates the Cartan Object
         
         Args:
@@ -391,7 +391,12 @@ class Cartan:
                 * `'evenOdd'`: m contains an even number of non-identity pauli terms in each string, k contains an odd nunber of non-idenity elements
                 * `'knejaGlaser'`: m contains elements ending in Y or X, k contains elements ending in I or Z
                 * `'count' + 'X', 'Y', or 'Z'`: Counts of the number of the specified Pauli Tuple. Even count in m, odd in k
-        
+            order (int, default = 0):
+                g(H) is generated iteratively until it fails to generate new terms. We call each term in H, [H,H], [H,[H,H]], ... order 0, 1, 2, and going up.
+                Generally, the larger the system the larger the order of terms required to generate g(H). Setting the order greater than 0 ensure that g(H) will only result in terms the distance of commutators from H.
+                However, this results in an incomplete algebra for g. Be warned. 
+            manualMode (bool, default = 0):
+                Choose either 0 (automatic) or 1 (manual). automatic generates h, k, m, and h when the object is created. manual requires the user call the respective functions.
         Attributes:
             hamiltonian (::hamiltonian:: object): Allows access to HCoefficients and HTuples
             HTuples (List of Tuples): Copies over the HTuples from the hamiltonian object
@@ -399,10 +404,12 @@ class Cartan:
             k (List of Tuples): Specified by the decomposition. Changing k regenerates h and the order of g (g = k + h + (m\h))
             h (List of Tuples): Specified by SubAlgebra(). Defaults to seeding by m, otherwise allows for inclusion of specific elements
         """
+        self.mode = manualMode
         self.hamiltonian = hamObj
         self.HTuples = self.hamiltonian.HTuples
-        self.g = self.makeGroup(self.HTuples, order)
-        self.decompose(involution)
+        if self.mode == 0:
+            self.g = self.makeGroup(self.HTuples, order)
+            self.decompose(involution)
         
 
     def decompose(self, involutionName):
@@ -433,15 +440,8 @@ class Cartan:
                 break
         if invalidInvolutionFlag == 1:
             raise Exception('Invalid Involution. Please Choose an involution such that H ⊂ m')
-        self.subAlgebra()
-
-    def getOrderedAlgebra(self, g):
-        """
-        Returns a List of lists for the terms in g(H). The 0th index is terms in H, the 1st index is terms in [H,H], and the 2nd index is terms in [H,[H,H]], etc.
-        The length of the list is the number of orders of commutators. 
-
-
-        """
+        if self.mode == 0:
+            self.subAlgebra()
 
     def makeGroup(self,g, order=0):
         '''
