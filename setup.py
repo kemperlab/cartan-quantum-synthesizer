@@ -5,7 +5,7 @@ setup(
     url='https://github.com/kemperlab/cartan-quantum-synthesizer',
     author='Thomas Steckmann, Efekan Kokcu',
     author_email='tmsteckm@ncsu.edu, ekokcu@ncsu.edu',
-    packages=['CQS.util'],
+    packages=['CQS.util', 'CQS'],
     project_urls={
         "Documentation": "https://kemperlab.github.io/cartan-quantum-synthesizer/",
     },
