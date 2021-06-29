@@ -426,6 +426,13 @@ class Cartan:
             (self.m, self.k) = self.elemcount(self.g, 2)
         elif involutionName == 'countZ': 
             (self.m, self.k) = self.elemcount(self.g, 3)
+        invalidInvolutionFlag = 0
+        for Hi in self.HTuples:
+            if not Hi in self.m:
+                invalidInvolutionFlag = 1
+                break
+        if invalidInvolutionFlag == 1:
+            raise Exception('Invalid Involution. Please Choose an involution such that H ⊂ m')
         self.subAlgebra()
 
     def getOrderedAlgebra(self, g):
