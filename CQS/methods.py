@@ -648,7 +648,7 @@ class FindParameters:
     * Thomas Steckmann
     * Efekan Kokcu
     """
-    def __init__(self, cartan, saveFileName = None, loadfileName=None, optimizerMethod='BFGS', accuracy=1e-5, initialGuess=None, steps = 5000):
+    def __init__(self, cartan, saveFileName = None, loadfileName=None, optimizerMethod='BFGS', accuracy=1e-5, initialGuess=None, steps = 5000, useCommTables=True):
         """
         Initializing a FindParameters class automatically runs the optimizer over the Cartan decomposition and provided Hamiltonian
         
@@ -677,7 +677,8 @@ class FindParameters:
         """
         #Initialize Values
         self.cartan = cartan #Extracts the hamiltonian object
-        self.hamiltonian = self.cartan.hamiltonian #Extracts the hamiltonain object
+        self.hamiltonian = self.cartan.hamiltonian #Extracts the hamiltonain objects
+        self.useCommTables = useCommTables
         self.optimizerMethod = optimizerMethod
         self.accuracy = accuracy
         self.lenK = len(self.cartan.k)
@@ -696,8 +697,9 @@ class FindParameters:
                 self.saveFileName = saveFileName
             
             #Generating reused values before begining the optimizer loop
-            self.setCommutatorTables() #Sets values for a look-up table for the commutators
-            self.generateIndexLists()
+            if useCommTables == True: #Faster, but only works for a complete algebra
+                self.setCommutatorTables() #Sets values for a look-up table for the commutators
+                self.generateIndexLists()
             #Generates coefficients for v, a dense element in the h algebra
             pi = np.pi
             self.vcoefs = [1]
@@ -833,41 +835,74 @@ class FindParameters:
         TODO: 
             * Comment the steps in this section
         '''
+        if self.useCommTables:
+            maxsize = 0
+            #Prepares two lists: One for v matching dense coefficients with indices in g, One for H matching coefficients to indeices
+            resV = [self.vcoefs,self.hElementIndices]
+            resH = [self.hamiltonian.HCoefs, self.HElementIndices]
 
-        maxsize = 0
-        #Prepares two lists: One for v matching dense coefficients with indices in g, One for H matching coefficients to indeices
-        resV = [self.vcoefs,self.hElementIndices]
-        resH = [self.hamiltonian.HCoefs, self.HElementIndices]
+            for i in range(len(thetas1)-1,index,-1):
+                resV = self.adj_action(thetas1[i],self.kElementIndices[i],resV[0],resV[1])
 
-        for i in range(len(thetas1)-1,index,-1):
-            resV = self.adj_action(thetas1[i],self.kElementIndices[i],resV[0],resV[1])
+            
+            #add each exp(thetas2*k2) to the list in reverse order and negative coefficients
+            for i in range(index):
+                resH = self.adj_action(-thetas2[i],self.kElementIndices[i],resH[0],resH[1])
 
-        
-        #add each exp(thetas2*k2) to the list in reverse order and negative coefficients
-        for i in range(index):
-            resH = self.adj_action(-thetas2[i],self.kElementIndices[i],resH[0],resH[1])
+            #create identity matrix for this dimensions
+            I = (0,)*self.hamiltonian.sites
+            
+            
+            resV = self.multiplyLinCombRound([1],[I],resV[0],resV[1],self.accuracy)  
+            
+            if index >= 0:
+                resV = self.multiplyLinCombRound([math.cos(thetas1[index]),1j*math.sin(thetas1[index])],[I,self.cartan.k[index]],resV[0],resV[1],self.accuracy)    
 
-        #create identity matrix for this dimensions
-        I = (0,)*self.hamiltonian.sites
-        
-        
-        resV = self.multiplyLinCombRound([1],[I],resV[0],resV[1],self.accuracy)  
-        
-        if index >= 0:
-            resV = self.multiplyLinCombRound([math.cos(thetas1[index]),1j*math.sin(thetas1[index])],[I,self.cartan.k[index]],resV[0],resV[1],self.accuracy)    
+                resV = self.multiplyLinCombRound(resV[0],resV[1],[math.cos(thetas2[index]),-1j*math.sin(thetas2[index])],[I,self.cartan.k[index]],self.accuracy)    
 
-            resV = self.multiplyLinCombRound(resV[0],resV[1],[math.cos(thetas2[index]),-1j*math.sin(thetas2[index])],[I,self.cartan.k[index]],self.accuracy)    
+                    
+            #get trace of v*H
+            trace = 0
+            for i in range(len(resV[0])):
+                for j in range(len(resH[0])):
+                    if resV[1][i] == self.cartan.g[int(resH[1][j])]:
+                        trace = trace + resV[0][i]*resH[0][j]
+            
+            return trace
+        else: #Does not use the list index format, so computing commutators is slower
+            maxsize = 0
+            #Prepares two lists: One for v matching dense coefficients with indices in g, One for H matching coefficients to indeices
+            resV = [self.vcoefs,self.cartan.h]
+            resH = [self.hamiltonian.HCoefs, self.hamiltonian.HTuples]
 
-                
-        #get trace of v*H
-        trace = 0
-        for i in range(len(resV[0])):
-            for j in range(len(resH[0])):
-                if resV[1][i] == self.cartan.g[int(resH[1][j])]:
-                    trace = trace + resV[0][i]*resH[0][j]
-        
-        return trace
-    
+            for i in range(len(thetas1)-1,index,-1):
+                resV = self.adj_action(thetas1[i],self.cartan.k[i],resV[0],resV[1])
+
+            
+            #add each exp(thetas2*k2) to the list in reverse order and negative coefficients
+            for i in range(index):
+                resH = self.adj_action(-thetas2[i],self.cartan.k[i],resH[0],resH[1])
+
+            #create identity matrix for this dimensions
+            I = (0,)*self.hamiltonian.sites
+            
+            
+            resV = self.multiplyLinCombRound([1],[I],resV[0],resV[1],self.accuracy)  
+            
+            if index >= 0:
+                resV = self.multiplyLinCombRound([math.cos(thetas1[index]),1j*math.sin(thetas1[index])],[I,self.cartan.k[index]],resV[0],resV[1],self.accuracy)    
+
+                resV = self.multiplyLinCombRound(resV[0],resV[1],[math.cos(thetas2[index]),-1j*math.sin(thetas2[index])],[I,self.cartan.k[index]],self.accuracy)    
+
+                    
+            #get trace of v*H
+            trace = 0
+            for i in range(len(resV[0])):
+                for j in range(len(resH[0])):
+                    if resV[1][i] == self.cartan.g[int(resH[1][j])]:
+                        trace = trace + resV[0][i]*resH[0][j]
+            
+            return trace
     def CostFunction(self, thetas):
         '''
         returns Tr(exp(thetas•k)•v•exp(-thetas•k)•H)
@@ -908,29 +943,55 @@ class FindParameters:
         Returns:
             The Algebraic element in m which is the result of the Adjoint Action (Representation)
         '''
-        result = [[],[]]
-        
-        for i in range(len(coefs)): #Generally, this is applied to v, an element in h and in m. Iterates over the elements in m
-            m = tuples[i] #m is the index of some m element
-            c = coefs[i] #c is the associate index
-        
-            res = [[c],[m]] #Just establishes the normal coefficient + tupleIndex pair
-            comm = self.commutatePauliString(1,k,c/2,m) #Computes the commutator of the m currently in the loopand input k element,
-            if comm[0] != 0:
-                res = [[c*math.cos(2*theta),1j*math.sin(2*theta)*comm[0]],[m,comm[1]]]  #If they do not commute, computes ?? (The exponential?)
-                
-            for q in range(len(res[0])):
-                flag = 0
-                for j in range(len(result[0])):
-                    if res[1][q] == result[1][j]:
-                        result[0][j] = result[0][j] + res[0][q]
-                        flag = 1
-                        break
-                if flag == 0:
-                    result[0].append(res[0][q])
-                    result[1].append(res[1][q])
-                        
-        return result
+        if self.useCommTables:
+            result = [[],[]]
+            
+            for i in range(len(coefs)): #Generally, this is applied to v, an element in h and in m. Iterates over the elements in m
+                m = tuples[i] #m is the index of some m element
+                c = coefs[i] #c is the associate index
+            
+                res = [[c],[m]] #Just establishes the normal coefficient + tupleIndex pair
+                comm = self.commutatePauliString(1,k,c/2,m) #Computes the commutator of the m currently in the loopand input k element,
+                if comm[0] != 0:
+                    res = [[c*math.cos(2*theta),1j*math.sin(2*theta)*comm[0]],[m,comm[1]]]  #If they do not commute, computes ?? (The exponential?)
+                    
+                for q in range(len(res[0])):
+                    flag = 0
+                    for j in range(len(result[0])):
+                        if res[1][q] == result[1][j]:
+                            result[0][j] = result[0][j] + res[0][q]
+                            flag = 1
+                            break
+                    if flag == 0:
+                        result[0].append(res[0][q])
+                        result[1].append(res[1][q])
+                            
+            return result
+        else:
+            
+            result = [[],[]]
+            
+            for i in range(len(coefs)): #Generally, this is applied to v, an element in h and in m. Iterates over the elements in m
+                m = tuples[i] #m is the index of some m element
+                c = coefs[i] #c is the associate index
+            
+                res = [[c],[m]] #Just establishes the normal coefficient + tupleIndex pair
+                comm = self.commutatePauliString(1,k,c/2,m) #Computes the commutator of the m currently in the loopand input k element,
+                if comm[0] != 0:
+                    res = [[c*math.cos(2*theta),1j*math.sin(2*theta)*comm[0]],[m,comm[1]]]  #If they do not commute, computes ?? (The exponential?)
+                    
+                for q in range(len(res[0])):
+                    flag = 0
+                    for j in range(len(result[0])):
+                        if res[1][q] == result[1][j]:
+                            result[0][j] = result[0][j] + res[0][q]
+                            flag = 1
+                            break
+                    if flag == 0:
+                        result[0].append(res[0][q])
+                        result[1].append(res[1][q])
+                            
+            return result
         
     def sethVecFromk(self):
         '''
