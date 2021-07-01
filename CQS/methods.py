@@ -865,7 +865,7 @@ class FindParameters:
             trace = 0
             for i in range(len(resV[0])):
                 for j in range(len(resH[0])):
-                    if resV[1][i] == self.cartan.g[int(resH[1][j])]:
+                    if resV[1][i] == self.cartan.g[int(resH[1][j])]: #Checks if the elements are the same
                         trace = trace + resV[0][i]*resH[0][j]
             
             return trace
@@ -899,7 +899,7 @@ class FindParameters:
             trace = 0
             for i in range(len(resV[0])):
                 for j in range(len(resH[0])):
-                    if resV[1][i] == self.cartan.g[int(resH[1][j])]:
+                    if resV[1][i] == resH[1][j]:
                         trace = trace + resV[0][i]*resH[0][j]
             
             return trace
@@ -968,7 +968,7 @@ class FindParameters:
                             
             return result
         else:
-            
+
             result = [[],[]]
             
             for i in range(len(coefs)): #Generally, this is applied to v, an element in h and in m. Iterates over the elements in m
