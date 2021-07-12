@@ -689,7 +689,10 @@ class FindParameters:
             #with open(loadfileName + '.csv', "r") as f:
             #    csv_reader = csv.reader(csv_file, delimiter=',')
             raise Exception('Unable to continue, file loading is not implemented')
-
+        elif self.lenK == 0: #Specific exception handling to prevent breaking on commuting Hamiltonians 
+            self.hCoefs = self.hamiltonian.HCoefs
+            #self.hTuples = self.hamiltonian.HTuples
+            self.kCoefs = []
         else:   
             if saveFileName is not None:
                 if not os.access(saveFileName, os.W_OK): #Verifies write permission

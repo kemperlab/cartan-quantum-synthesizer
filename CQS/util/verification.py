@@ -55,8 +55,8 @@ def PauliExpUnitary(N, co, PauliTuple):
 
 def exactU(HCos, HTups, time):
     """
-    Computes the exact matrix exponential for time evolution at the time t
-
+    Computes the exact matrix exponential for time evolution at the time t. Takes as an input the real component of the exponential.
+    
     Args:
         HCos (List of complex numbers):
         HTupes (List of (PauliStrings)):
@@ -111,7 +111,7 @@ def KHK(kCoefs, hCoefs, k, h):
 
 
     """
-    N = len(k[0])
+    N = len(h[0])
     KHK = Nident(N)
     
     #First loop of K terms:
