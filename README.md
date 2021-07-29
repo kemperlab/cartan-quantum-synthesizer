@@ -102,7 +102,7 @@ Alternatively, and for more general use cases, users can add their own coefficie
 </ol>
 For an example usage of the third input for .addTerms(), if the desired terms are formatted as a dictionary (and the Pauli Strings represented correctly in our Tuple format), the user can call:
 
-<code>
+````
 
 testHamiltonian = Hamiltonian(4) 
 
@@ -112,7 +112,7 @@ hamiltonianDict = {(1,1,0,0): 3,
 
 testHamiltonian.addterms(([i for i in hamiltonianDict.values()], [i for i in hamiltonianDict.keys()])
 
-</code>
+```
 
 ## Cartan:
 The main methods that might be useful in Cartan are <code>Cartan.decompose()</code> and <code>Cartan.subAlgebra()</code>. decompose allows users to specify one of the Cartan Involutions by passing the name. The default option is EvenOdd, which might not be the best for all models. 'CountY' is generally very useful. subAlgebra allows users to pass a set of (pauliStrings), which must commute and exist in m, to be the basis for the Cartan Subalgebra. Generally, the subalgebra is not unique and clever choice of the subalgebra may reduce the circuit size. 
