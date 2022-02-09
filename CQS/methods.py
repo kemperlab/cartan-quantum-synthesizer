@@ -40,7 +40,7 @@ class Hamiltonian:
     * Efekan Kokcu
     """
     def __init__(self, sites, name = None):
-        """Initializes an emtpy Hamiltnoan, unless name is specified
+        """Initializes an empty Hamiltonian, unless name is specified
 
         name is not required as an input to initialize the Hamiltonian, only the number of qubits. After intializing the Hamiltonian, users can use addModel() to add a single, imlemented Hamiltonian at a time and use .addTerms() to add lists of terms or individual terms. .removeTerm() can be used to remove a single term at a time
 
@@ -49,9 +49,9 @@ class Hamiltonian:
             name (List of Tuples): Easily build Hamiltonians from native models. 
 
                 ### Options:
-                    - `[(coefficient, 'modelname', periodic boundary condisitons boolian)]` - Builds a single Hamiltonian with constant coefficient. Periodic boundary conditions are true or false, false is assumed if not specified
+                    - `[(coefficient, 'modelname', periodic boundary conditions boolean)]` - Builds a single Hamiltonian with constant coefficient. Periodic boundary conditions are true or false, false is assumed if not specified
                     - `[([list of coefficients], 'modelname')]` - Populates the Hamiltonian using the list of coefficients. Lengths must match
-                    - `[(coefficient, 'modelname1'),([list of coefficients], 'modelname2')]` - Combines two Hamiltonains. Order my alter default choice of 𝖍
+                    - `[(coefficient, 'modelname1'),([list of coefficients], 'modelname2')]` - Combines two Hamiltonians. Order my alter default choice of 𝖍
                 #### Examples:
                     - `[(1,'xy', True)]` on three qubits gives: XXI + YYI + IXX + IYY + XIX + YIY
                     - `[([1,2],'kitaevEven')]` on three qubits gives: 1*XXI + 2*IYY 
@@ -135,7 +135,7 @@ class Hamiltonian:
             pair (List of Tuples or Tuple of Lists or Tuple): Formatted as either
                 * `[(coefficient, PauliString), (coefficient, PauliStringTuple),...]`
                 * `(coefficient, (PauliString))`
-                * `([coefficienList],[(PauliStringList)])
+                * `([coefficientList],[(PauliStringList)])
 
         Examples:
             * `Hamiltonian.addTerms((0.45, (1,3,2,0,0,0)))`
@@ -385,10 +385,10 @@ class Cartan:
         Args:
             hamObj (Hamiltonian): Passes a Hamiltonian Object containing the full information about the system
             involution (String, default='evenOdd'):
-                Allows a choice of the k,m involuiton
+                Allows a choice of the k,m involution
 
                 Options:
-                * `'evenOdd'`: m contains an even number of non-identity pauli terms in each string, k contains an odd nunber of non-idenity elements
+                * `'evenOdd'`: m contains an even number of non-identity pauli terms in each string, k contains an odd number of non-identity elements
                 * `'knejaGlaser'`: m contains elements ending in Y or X, k contains elements ending in I or Z
                 * `'count' + 'X', 'Y', or 'Z'`: Counts of the number of the specified Pauli Tuple. Even count in m, odd in k
             order (int, default = 0):
@@ -417,7 +417,7 @@ class Cartan:
         Sets a new Involution using a switch. Regenerates h using the default first element in m
 
         Options:
-                * `'evenOdd'`: m contains an even number of non-identity pauli terms in each string, k contains an odd nunber of non-idenity elements
+                * `'evenOdd'`: m contains an even number of non-identity pauli terms in each string, k contains an odd number of non-identity elements
                 * `'knejaGlaser'`: m contains elements ending in Y or X, k contains elements ending in I or Z
                 * `'count' + 'X', 'Y', or 'Z'`: Counts of the number of the specified Pauli Tuple. Even count in m, odd in k
         """
@@ -526,7 +526,7 @@ class Cartan:
         return m,k
     
     def included(self,g,m):
-        '''Following function returns 0 if tuple m is not incu=luded in tuple list g, returns 1 if it is included.
+        '''Following function returns 0 if tuple m is not included in tuple list g, returns 1 if it is included.
             
             Args:
                 g (List of Tuples): 
@@ -549,7 +549,7 @@ class Cartan:
 
 
     def evenOdd(self,g):
-        """ Partitions the Algebra by counting the number of non-idenity Pauli elements
+        """ Partitions the Algebra by counting the number of non-identity Pauli elements
 
         Args:
             g (List of Tuples):
@@ -559,7 +559,7 @@ class Cartan:
             k (List of Tuples):
                 The List of Pauli Strings with Odd non-identity terms
             m (List of Tuples):
-                The List of Pauli Strings with Even non-idenity terms
+                The List of Pauli Strings with Even non-identity terms
         """
         k = []
         m = []
@@ -668,7 +668,7 @@ class FindParameters:
                     * `'BFGS'` : Uses Gradient
                     * `'Powel'`: Does not use Gradient
             accuracy (float, default=1e-5): Optimizer convergence Criteria
-            initialGuess (List of values): Allows the user to specify the inital guess for k. Must be correct, no input checking is currently implemented
+            initialGuess (List of values): Allows the user to specify the initial guess for k. Must be correct, no input checking is currently implemented
             steps (int): The maximum number of optimization steps before termination
         
         Returns:
@@ -683,6 +683,7 @@ class FindParameters:
         self.accuracy = accuracy
         self.lenK = len(self.cartan.k)
         self.lenh = len(self.cartan.h)
+        self.tolerance = 1e-7
         self.steps = steps
         #Begin Optimizer
         if loadfileName is not None: #If able to, loads prior results
@@ -731,6 +732,8 @@ class FindParameters:
 
             print('Optimization Error:')
             print(self.error)
+            if self.error > self.tolerance:
+                raise Exception('Function Failed to Minimize below error tolerance')
 
             if saveFileName is not None:
                 self.saveKH()
