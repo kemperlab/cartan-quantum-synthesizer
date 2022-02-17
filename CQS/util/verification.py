@@ -68,7 +68,20 @@ def exactU(HCos, HTups, time):
     for (co, term) in zip(HCos, HTups):
         H = H + IO.tuplesToMatrix(co, term)
     return expm(1j * time * H)
+def exactH(HCos, HTups):
+    """
+    Returns the matrix representation of the Hamiltonian
+    
+    Args:
+        HCos (List of complex numbers):
+        HTupes (List of (PauliStrings)):
 
+
+    """
+    H = np.diag(np.zeros(2**len(HTups[0])))
+    for (co, term) in zip(HCos, HTups):
+        H = H + IO.tuplesToMatrix(co, term)
+    return H
 
 
 def Trotter(ham, time, N, steps):

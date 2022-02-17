@@ -526,7 +526,7 @@ class Cartan:
         return m,k
     
     def included(self,g,m):
-        '''Following function returns 0 if tuple m is not incu=luded in tuple list g, returns 1 if it is included.
+        '''Following function returns 0 if tuple m is not inculuded in tuple list g, returns 1 if it is included.
             
             Args:
                 g (List of Tuples): 
@@ -549,7 +549,7 @@ class Cartan:
 
 
     def evenOdd(self,g):
-        """ Partitions the Algebra by counting the number of non-idenity Pauli elements
+        """ Partitions the Algebra by counting the number of non-identity Pauli elements
 
         Args:
             g (List of Tuples):
@@ -559,7 +559,7 @@ class Cartan:
             k (List of Tuples):
                 The List of Pauli Strings with Odd non-identity terms
             m (List of Tuples):
-                The List of Pauli Strings with Even non-idenity terms
+                The List of Pauli Strings with Even non-identity terms
         """
         k = []
         m = []
@@ -648,7 +648,7 @@ class FindParameters:
     * Thomas Steckmann
     * Efekan Kokcu
     """
-    def __init__(self, cartan, saveFileName = None, loadfileName=None, optimizerMethod='BFGS', accuracy=1e-5, initialGuess=None, steps = 5000, useCommTables=True):
+    def __init__(self, cartan, saveFileName = None, loadfileName=None, optimizerMethod='BFGS', accuracy=1e-5, initialGuess=None, steps = 5000, useCommTables=True, norm=False):
         """
         Initializing a FindParameters class automatically runs the optimizer over the Cartan decomposition and provided Hamiltonian
         
@@ -684,6 +684,8 @@ class FindParameters:
         self.lenK = len(self.cartan.k)
         self.lenh = len(self.cartan.h)
         self.steps = steps
+        self.norm = norm
+        self.exactH =  None
         #Begin Optimizer
         if loadfileName is not None: #If able to, loads prior results
             #with open(loadfileName + '.csv', "r") as f:
@@ -815,12 +817,24 @@ class FindParameters:
             The object returned by the Scipy Optimizer. Contains information about the minimum, parameters, and a few other things
         """
         initialGuess = self.initialGuess
-        if self.optimizerMethod == 'BFGS':
+        if self.norm:
+            optimimumReturn = scipy.optimize.minimize(self.CostFunction, initialGuess, method='BFGS', options={'disp': True})
+        elif self.optimizerMethod == 'BFGS':
             optimiumReturn = scipy.optimize.minimize(self.CostFunction,initialGuess, method='BFGS', jac = self.gradCostFunction,options={'disp':True, 'gtol':self.accuracy, 'maxiter':self.steps})
         elif self.optimizerMethod == 'Powell':
             optimiumReturn = scipy.optimize.minimize(self.CostFunction,initialGuess, method='Powell',options={'disp':True, 'ftol':self.accuracy, 'maxiter':self.steps})
+
         self.kCoefs = optimiumReturn.x
         return optimiumReturn
+    def unitaryCostFunction(self, thetas):
+        """
+        Minimizes the norm of the difference between the target and KHK operator. Useful for small qubit number approximations
+        """
+        if not self.exactH == None:
+            self.exactH = IO.exactH(self.hamiltonian.HTuples, self.hamiltonian.Hcoefs)
+        
+
+                     
 
     def generalCostFunction(self, thetas1, thetas2, index):
         '''
