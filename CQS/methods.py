@@ -871,14 +871,12 @@ class FindParameters:
             for k in range(self.lenm):
                 val = self.comm_table[k][j][0]
                 if val != 0:
-                    self.kappa[j][0] = val
+                    self.kappa[j][0] = val 
                     self.kappa[j][1] = self.comm_table[k][j][1]
-        print(self.cartan.m)
-        print(self.cartan.k)
-        print(self.kappa)
         #Step 3: Construct the functions used in the solver, set as:
         #See below
-
+        print(self.kappa)
+        print(self.comm_table)
         #Step 4: Initial Conditions:
         beta0 = np.zeros(self.lenm + self.lenK)
         for (co, tup) in zip(self.hamiltonian.HCoefs, self.hamiltonian.HTuples):
@@ -886,7 +884,6 @@ class FindParameters:
                 if tup == self.cartan.m[i]:
                     beta0[i] = co
                     break
-        print(beta0)
         #Step 5: Solver:
         integrator = ode(self.func).set_integrator('dopri5')
         integrator.set_initial_value(beta0, 0)
@@ -915,9 +912,11 @@ class FindParameters:
                 for j in range(self.lenK):
                     betaComm = self.comm_table[(k, j)]
                     kappaComm = self.kappa[j]
+                    #print((beta[int(betaComm[1])],betaComm[0], kappaComm[0],beta[int(kappaComm[1])]))
                     f[k] += beta[int(betaComm[1])]*betaComm[0] * kappaComm[0]*beta[int(kappaComm[1])]
         for k in range(self.lenm, self.lenm + self.lenK):
-            f[k] = self.kappa[k - self.lenm][0] #########THIS IS THE ISSUE, I'm USING THE WRONG INDEX
+            kappaComm = self.kappa[k - self.lenm]
+            f[k] = kappaComm[0] * beta[int(kappaComm[1])]
         return f
 
 
