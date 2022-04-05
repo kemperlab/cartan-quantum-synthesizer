@@ -36,6 +36,7 @@ SIGN_RULES = [[1,1,1,1],
              [1, 1, 1j, -1j],
              [1, -1j, 1, 1j],
              [1, 1j, -1j, 1]]
+
 """
 Rules for computing the sign of two commutators
 ```
@@ -61,7 +62,7 @@ paulis = [I,X,Y,Z]
 #Allows for indexing the Pauli Arrays (Converting from tuple form (0,1,2,3) to string form IXYZ)
 
 def commutatePauliString(a,tupleA,b,tupleB, comm_coefs = None, comm_table = None):
-    """Computes the commutator of two Pauli Strings representated as a tuple
+    """Computes the commutator of two Pauli Strings represented as a tuple
     
     If a commutator table is passed, the operation is much more efficient
 
@@ -69,11 +70,11 @@ def commutatePauliString(a,tupleA,b,tupleB, comm_coefs = None, comm_table = None
         a (np.complex128): 
             The coefficient of the first Pauli String term
         tupleA (Tuple, integer): 
-            tuple represenation of the first Pauli String, or the index in the commutator table
+            tuple representation of the first Pauli String, or the index in the commutator table
         b (np.complex128): 
             The coefficient of the second Pauli String term
         tupleB (tuple, int): 
-            tuple represenation of the second Pauli String, or the index in the commutator table
+            tuple representation of the second Pauli String, or the index in the commutator table
         
     
     Returns:

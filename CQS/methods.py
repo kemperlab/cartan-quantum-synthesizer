@@ -8,6 +8,7 @@ import numpy as np
 import csv
 import os
 import math
+from scipy.integrate import ode
 
 #Local Imports
 from CQS.util.PauliOps import commutatePauliString
@@ -526,7 +527,7 @@ class Cartan:
         return m,k
     
     def included(self,g,m):
-        '''Following function returns 0 if tuple m is not inculuded in tuple list g, returns 1 if it is included.
+        '''Following function returns 0 if tuple m is not included in tuple list g, returns 1 if it is included.
             
             Args:
                 g (List of Tuples): 
@@ -667,6 +668,7 @@ class FindParameters:
                 Options: 
                     * `'BFGS'` : Uses Gradient
                     * `'Powel'`: Does not use Gradient
+                    * ``Lax``: Solves the form for K using Lax Dynamics
             accuracy (float, default=1e-5): Optimizer convergence Criteria
             initialGuess (List of values): Allows the user to specify the inital guess for k. Must be correct, no input checking is currently implemented
             steps (int): The maximum number of optimization steps before termination
@@ -702,37 +704,38 @@ class FindParameters:
                 self.saveFileName = saveFileName
             
             #Generating reused values before begining the optimizer loop
-            if useCommTables == True: #Faster, but only works for a complete algebra
+            if useCommTables == True and optimizerMethod != 'Lax': #Faster, but only works for a complete algebra
                 self.setCommutatorTables() #Sets values for a look-up table for the commutators
                 self.generateIndexLists()
             #Generates coefficients for v, a dense element in the h algebra
-            pi = np.pi
-            self.vcoefs = [1]
-            for i in range(len(self.cartan.h)-1):
-                term = pi*self.vcoefs[i]
-                while term > 1:
-                    term = term-1
-                self.vcoefs.append(term)
+            if not optimizerMethod == 'Lax':
+                pi = np.pi
+                self.vcoefs = [1]
+                for i in range(len(self.cartan.h)-1):
+                    term = pi*self.vcoefs[i]
+                    while term > 1:
+                        term = term-1
+                    self.vcoefs.append(term)
             
 
             
-            #If specified, defines an inital guess. If not, sets it to all zeros
-            if initialGuess is not None:
-                self.initialGuess = initialGuess
-            else:
-                self.initialGuess = initialGuess = np.zeros(len(self.cartan.k))
-            
-            #Calls the function that contains the optimizer loop
+                #If specified, defines an inital guess. If not, sets it to all zeros
+                if initialGuess is not None:
+                    self.initialGuess = initialGuess
+                else:
+                    self.initialGuess = initialGuess = np.zeros(len(self.cartan.k))
+                
+                #Calls the function that contains the optimizer loop
             total_time = time.time()
             self.optimizerOutput = self.optimize()
             timepassed = time.time() - total_time
             print('--- ' + str(timepassed) +  ' seconds ---')
+            if not optimizerMethod == 'Lax':
+                self.sethVecFromk()
+                self.error = self.errorhVec()
 
-            self.sethVecFromk()
-            self.error = self.errorhVec()
-
-            print('Optimization Error:')
-            print(self.error)
+                print('Optimization Error:')
+                print(self.error)
 
             if saveFileName is not None:
                 self.saveKH()
@@ -777,10 +780,9 @@ class FindParameters:
                     for q in range(len(g_tuples)):
                         if res[1] == g_tuples[q]:
                             self.comm_table[i][j] = q
-    
+
     def generateIndexLists(self):
         """Generates a lists for H, h, and k using indices in g instead of as lists of Tuples"""
-
         #Computes the indices of each of the k elements in the g list                   
         self.kElementIndices = []
         for i in range(len(self.cartan.k)):
@@ -816,23 +818,115 @@ class FindParameters:
         Returns: 
             The object returned by the Scipy Optimizer. Contains information about the minimum, parameters, and a few other things
         """
-        initialGuess = self.initialGuess
+        optimumReturn = None
+        if not self.optimizerMethod == 'Lax':
+            initialGuess = self.initialGuess
         if self.norm:
             optimimumReturn = scipy.optimize.minimize(self.CostFunction, initialGuess, method='BFGS', options={'disp': True})
         elif self.optimizerMethod == 'BFGS':
-            optimiumReturn = scipy.optimize.minimize(self.CostFunction,initialGuess, method='BFGS', jac = self.gradCostFunction,options={'disp':True, 'gtol':self.accuracy, 'maxiter':self.steps})
+            optimumReturn = scipy.optimize.minimize(self.CostFunction,initialGuess, method='BFGS', jac = self.gradCostFunction,options={'disp':True, 'gtol':self.accuracy, 'maxiter':self.steps})
         elif self.optimizerMethod == 'Powell':
-            optimiumReturn = scipy.optimize.minimize(self.CostFunction,initialGuess, method='Powell',options={'disp':True, 'ftol':self.accuracy, 'maxiter':self.steps})
+            optimumReturn = scipy.optimize.minimize(self.CostFunction,initialGuess, method='Powell',options={'disp':True, 'ftol':self.accuracy, 'maxiter':self.steps})
+        elif self.optimizerMethod == 'Lax':
+            optimimumReturn = self.solveLax()
 
-        self.kCoefs = optimiumReturn.x
-        return optimiumReturn
+        if not self.optimizerMethod == 'Lax':
+            self.kCoefs = optimumReturn.x
+        return optimumReturn
+
     def unitaryCostFunction(self, thetas):
         """
         Minimizes the norm of the difference between the target and KHK operator. Useful for small qubit number approximations
         """
         if not self.exactH == None:
             self.exactH = IO.exactH(self.hamiltonian.HTuples, self.hamiltonian.Hcoefs)
-        
+    
+    def solveLax(self):
+        '''
+        Solves for K in the exponential mapping using Lax Dynamics and Parameter flows
+        '''
+        #Step 1: Compute the commutator table between hm and k
+        self.comm_table = np.zeros((len(self.cartan.m), len(self.cartan.k), 2))
+        mtilde = self.cartan.g[self.lenK + self.lenh:]
+        self.lenmTilde = len(mtilde)
+        self.lenm = len(self.cartan.m)
+        self.cartan.m = self.cartan.h + mtilde
+        #Iterate through each X(t)
+        for (i, m) in enumerate(self.cartan.m):
+            for (j, k) in enumerate(self.cartan.k):
+                #compute the structure constants f_{i,j}^k, and place it in the comm_table[(k, j, 0)]
+                #Place the corresponding value of i in the comm_table[(k, j, 1)]
+                c, c_tuple = self.commutatePauliString(1, m, 1, k)
+                if c == 0:
+                    pass
+                else:
+                    for index in range(self.lenm):
+                        if c_tuple == self.cartan.m[index]:
+                            self.comm_table[i][j][0] = c.imag
+                            self.comm_table[i][j][1] = index
+                            break
+        #Step 2: Compute Kappa array
+        self.kappa = np.zeros((len(self.cartan.k),2))
+        for j in range(self.lenK):
+            for k in range(self.lenm):
+                val = self.comm_table[k][j][0]
+                if val != 0:
+                    self.kappa[j][0] = val
+                    self.kappa[j][1] = self.comm_table[k][j][1]
+        print(self.cartan.m)
+        print(self.cartan.k)
+        print(self.kappa)
+        #Step 3: Construct the functions used in the solver, set as:
+        #See below
+
+        #Step 4: Initial Conditions:
+        beta0 = np.zeros(self.lenm + self.lenK)
+        for (co, tup) in zip(self.hamiltonian.HCoefs, self.hamiltonian.HTuples):
+            for i in range(self.lenm):
+                if tup == self.cartan.m[i]:
+                    beta0[i] = co
+                    break
+        print(beta0)
+        #Step 5: Solver:
+        integrator = ode(self.func).set_integrator('dopri5')
+        integrator.set_initial_value(beta0, 0)
+        stopTime = 100
+        dt = 0.1
+        while integrator.successful() and integrator.t < stopTime:
+            integrator.integrate(integrator.t + dt)
+
+        print(integrator.y)
+        beta = integrator.y[:self.lenm]
+        chi = integrator.y[-self.lenK:]
+
+        #Step 6: Construct the k and h elements:
+        self.hCoefs = beta[:self.lenh]
+        self.kCoefs = chi % (2*np.pi)
+        return beta, chi
+
+
+    def func(self, t, x):
+        #Unpack x
+        beta = x[:self.lenm]
+        chi = x[-self.lenK:]
+        f = np.zeros(len(self.cartan.g))
+        #For the m components:
+        for k in range(self.lenm):
+                for j in range(self.lenK):
+                    betaComm = self.comm_table[(k, j)]
+                    kappaComm = self.kappa[j]
+                    f[k] += beta[int(betaComm[1])]*betaComm[0] * kappaComm[0]*beta[int(kappaComm[1])]
+        for k in range(self.lenm, self.lenm + self.lenK):
+            f[k] = self.kappa[k - self.lenm][0] #########THIS IS THE ISSUE, I'm USING THE WRONG INDEX
+        return f
+
+
+
+
+
+
+
+
 
                      
 

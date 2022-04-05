@@ -68,6 +68,7 @@ def exactU(HCos, HTups, time):
     for (co, term) in zip(HCos, HTups):
         H = H + IO.tuplesToMatrix(co, term)
     return expm(1j * time * H)
+
 def exactH(HCos, HTups):
     """
     Returns the matrix representation of the Hamiltonian
@@ -136,3 +137,24 @@ def KHK(kCoefs, hCoefs, k, h):
     for (term, co)  in zip(k[::-1], kCoefs[::-1]):
         KHK = KHK @ PauliExpUnitary(N, -1*co, term)
     return KHK
+
+def KHKtypeI(kCoefs, hCoefs, k, h):
+    N = len(h[0])
+    KHK = Nident(N)
+
+    #First loop of K terms:
+    k = expm(PauliSum(kCoefs, k))
+    KHK = KHK @ expm(k)
+    #H terms
+    for (term, co) in zip(h, hCoefs):
+        KHK = KHK @ PauliExpUnitary(N, co, term)
+    k = expm(PauliSum(-1*kCoefs, k))
+    KHK = KHK @ expm(k)
+    return KHK
+
+def PauliSum(coefficients, tuples):
+    H = np.diag(np.zeros(2**len(tuples[0])))
+
+    for (co, term) in zip(coefficients, tuples):
+        H = H + IO.tuplesToMatrix(co, term)
+    return H
