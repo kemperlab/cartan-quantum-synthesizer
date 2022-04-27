@@ -28,7 +28,7 @@ paulis = [I,X,Y,Z]
 def Nident (N):
     """ Generates an N qubit Identity Matrix """
 
-    return np.diag(np.ones(2**N))
+    return np.diag(np.ones(2**N, dtype=np.complex128))
 
 
 def PauliExpUnitary(N, co, PauliTuple):

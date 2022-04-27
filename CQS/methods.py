@@ -649,7 +649,7 @@ class FindParameters:
     * Thomas Steckmann
     * Efekan Kokcu
     """
-    def __init__(self, cartan, saveFileName = None, loadfileName=None, optimizerMethod='BFGS', accuracy=1e-5, initialGuess=None, steps = 5000, useCommTables=True, norm=False):
+    def __init__(self, cartan, saveFileName = None, loadfileName=None, optimizerMethod='BFGS', accuracy=1e-5, initialGuess=None, steps = 5000, useCommTables=True, norm=False, dt=0.01, truncateExp=20):
         """
         Initializing a FindParameters class automatically runs the optimizer over the Cartan decomposition and provided Hamiltonian
         
@@ -688,6 +688,8 @@ class FindParameters:
         self.steps = steps
         self.norm = norm
         self.exactH =  None
+        self.dt = dt
+        self.truncateExp = truncateExp 
         #Begin Optimizer
         if loadfileName is not None: #If able to, loads prior results
             #with open(loadfileName + '.csv', "r") as f:
@@ -728,8 +730,8 @@ class FindParameters:
                 #Calls the function that contains the optimizer loop
             total_time = time.time()
             self.optimizerOutput = self.optimize()
-            timepassed = time.time() - total_time
-            print('--- ' + str(timepassed) +  ' seconds ---')
+            self.timepassed = time.time() - total_time
+            print('--- ' + str(self.timepassed) +  ' seconds ---')
             if not optimizerMethod == 'Lax':
                 self.sethVecFromk()
                 self.error = self.errorhVec()
@@ -842,41 +844,63 @@ class FindParameters:
             self.exactH = IO.exactH(self.hamiltonian.HTuples, self.hamiltonian.Hcoefs)
     
     def solveLax(self):
+        import matplotlib.pyplot as plt
         '''
         Solves for K in the exponential mapping using Lax Dynamics and Parameter flows
         '''
-        #Step 1: Compute the commutator table between hm and k
-        self.comm_table = np.zeros((len(self.cartan.m), len(self.cartan.k), 2))
+        #Number of steps used to compute $$1-e^{-ad_X}/ad_{X}$$
+                #Step 1: Compute the commutator table between hm and k
+        self.comm_table = np.zeros((len(self.cartan.m), len(self.cartan.k), 2), dtype=np.int)
+        #Stores the structure constants $$f_{i,j}^{k}$$ with adKK[j,k] = $$f_{i,j}^{k}$$
+        self.adkk = np.zeros((len(self.cartan.k), len(self.cartan.k)), dtype=np.int)
+        #Stores a map of the values of i in the structure constants, used to index chi later. 
+        # chiMatrix[j,k] = chi[adKMapL[j,k]], chiMatrix \dot (element wise multiplication) adkk = ad_chi
+        self.adkMapk = np.zeros( (len(self.cartan.k), len(self.cartan.k)), dtype=np.int)
         mtilde = self.cartan.g[self.lenK + self.lenh:]
         self.lenmTilde = len(mtilde)
         self.lenm = len(self.cartan.m)
         self.cartan.m = self.cartan.h + mtilde
         #Iterate through each X(t)
-        for (i, m) in enumerate(self.cartan.m):
-            for (j, k) in enumerate(self.cartan.k):
-                #compute the structure constants f_{i,j}^k, and place it in the comm_table[(k, j, 0)]
-                #Place the corresponding value of i in the comm_table[(k, j, 1)]
+        for (j, k) in enumerate(self.cartan.k):
+            for (i, m) in enumerate(self.cartan.m):
+                #compute the structure constants f_{i,j}^k, and place it in the comm_table[i, j, 0]
+                #Place the corresponding value of i in the comm_table[i, j, 1]
                 c, c_tuple = self.commutatePauliString(1, m, 1, k)
                 if c == 0:
                     pass
                 else:
                     for index in range(self.lenm):
                         if c_tuple == self.cartan.m[index]:
-                            self.comm_table[i][j][0] = c.imag
-                            self.comm_table[i][j][1] = index
+                            self.comm_table[i,j,0] = int(c.imag)
+                            self.comm_table[i,j,1] = int(index)
                             break
+            for (l, k2) in enumerate(self.cartan.k):
+                #Compute the structure constants f_{i,j}^{l} and place it in the adkk[j,l]
+                #Compute the value of i and place it in the adkMapk[j,l]
+                c, c_tuple = self.commutatePauliString(1, k, 1, k2)
+                if c == 0:
+                    pass
+                else:
+                    for index in range(self.lenK):
+                        if c_tuple == self.cartan.k[index]:
+                            self.adkk[j,l] = int(c.imag)
+                            self.adkMapk[j,l] = index + 1
+                            break
+        
         #Step 2: Compute Kappa array
-        self.kappa = np.zeros((len(self.cartan.k),2))
+        self.kappa = np.zeros((len(self.cartan.k),2),dtype=np.int)
         for j in range(self.lenK):
             for k in range(self.lenm):
-                val = self.comm_table[k][j][0]
+                val = self.comm_table[k,j,0]
                 if val != 0:
-                    self.kappa[j][0] = val 
-                    self.kappa[j][1] = self.comm_table[k][j][1]
+                    self.kappa[j,0] = val 
+                    self.kappa[j,1] = self.comm_table[k,j,1]
+                    break
+
+                
         #Step 3: Construct the functions used in the solver, set as:
         #See below
-        print(self.kappa)
-        print(self.comm_table)
+
         #Step 4: Initial Conditions:
         beta0 = np.zeros(self.lenm + self.lenK)
         for (co, tup) in zip(self.hamiltonian.HCoefs, self.hamiltonian.HTuples):
@@ -887,18 +911,24 @@ class FindParameters:
         #Step 5: Solver:
         integrator = ode(self.func).set_integrator('dopri5')
         integrator.set_initial_value(beta0, 0)
-        stopTime = 100
-        dt = 0.1
+        stopTime = self.lenK
+        #self.dt = 0.1
+        flow = np.zeros((self.lenm + self.lenK, int((stopTime + 1)/self.dt)))
+        
         while integrator.successful() and integrator.t < stopTime:
-            integrator.integrate(integrator.t + dt)
+            try:
+                flow[:,index] = integrator.integrate(integrator.t + self.dt)
+            except:
+                print(integrator.t, stopTime)
+            index += 1
+        self.flow = flow
 
-        print(integrator.y)
         beta = integrator.y[:self.lenm]
         chi = integrator.y[-self.lenK:]
 
         #Step 6: Construct the k and h elements:
         self.hCoefs = beta[:self.lenh]
-        self.kCoefs = chi % (2*np.pi)
+        self.kCoefs = chi #% (2*np.pi)
         return beta, chi
 
 
@@ -912,13 +942,33 @@ class FindParameters:
                 for j in range(self.lenK):
                     betaComm = self.comm_table[(k, j)]
                     kappaComm = self.kappa[j]
-                    #print((beta[int(betaComm[1])],betaComm[0], kappaComm[0],beta[int(kappaComm[1])]))
                     f[k] += beta[int(betaComm[1])]*betaComm[0] * kappaComm[0]*beta[int(kappaComm[1])]
-        for k in range(self.lenm, self.lenm + self.lenK):
-            kappaComm = self.kappa[k - self.lenm]
-            f[k] = kappaComm[0] * beta[int(kappaComm[1])]
-        return f
 
+        #Initial some placeholder matricies
+        expDerivativeInner = np.diag(np.ones(self.lenK)) #Stores the sum
+        matrixPowerTemp = np.diag(np.ones(self.lenK)) #Stores the n-1th power of ad_chi
+        #Compute ad_chik, which is chiMatrix[j,k] = chi[adKMapL[j,k]], chiMatrix \dot (element wise multiplication) adkk = ad_chi
+        chiMatrix = np.zeros((self.lenK, self.lenK))
+        for index, value in np.ndenumerate(self.adkMapk):
+            value = value-1
+            if value == -1:
+                pass
+            else:
+                chiMatrix[index] = chi[value]
+        np.multiply(chiMatrix, self.adkk, out=chiMatrix)
+
+        
+        for n in range(1,self.truncateExp):
+            np.matmul(-1*matrixPowerTemp/(n+1), chiMatrix, out=matrixPowerTemp)
+            expDerivativeInner += matrixPowerTemp
+        kappaVec = self.kappa[:, 0]*beta[self.kappa[:, 1]]
+        f[self.lenm:] = np.linalg.inv(expDerivativeInner) @ (kappaVec)
+        #print(beta)
+        #print(chi)
+        #print(f)
+        return f
+    
+    #def adjointAction
 
 
 
@@ -1329,4 +1379,4 @@ class FindParameters:
                 writer = csv.writer(f)
                 writer.writerows(solutionList)
         f.close()
-        
+
