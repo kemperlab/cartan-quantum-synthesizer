@@ -19,10 +19,10 @@ import CQS.util.verification
 
 RULES = [1,3,1,3]
 #Used in generating commutator tables. See util.PauliOps
-SIGN_RULES = [[1,1,1,1], 
-             [1, 1, 1j, -1j],
-             [1, -1j, 1, 1j],
-             [1, 1j, -1j, 1]]
+SIGN_RULES = [[1,  1 ,  1 ,  1 ], 
+              [1,  1 ,  1j, -1j],
+              [1, -1j,  1 ,  1j],
+              [1,  1j, -1j,  1 ]]
 #Used in generating commutator tables. See util.PauliOps
 
 class Hamiltonian:
@@ -874,6 +874,7 @@ class FindParameters:
                             self.comm_table[i,j,0] = int(c.imag)
                             self.comm_table[i,j,1] = int(index)
                             break
+        
             for (l, k2) in enumerate(self.cartan.k):
                 #Compute the structure constants f_{i,j}^{l} and place it in the adkk[j,l]
                 #Compute the value of i and place it in the adkMapk[j,l]
@@ -911,15 +912,16 @@ class FindParameters:
         #Step 5: Solver:
         integrator = ode(self.func).set_integrator('dopri5')
         integrator.set_initial_value(beta0, 0)
-        stopTime = self.lenK
+        stopTime = 1 + int(self.lenK / 10)
         #self.dt = 0.1
         flow = np.zeros((self.lenm + self.lenK, int((stopTime + 1)/self.dt)))
-        
+        flow[:,0] = beta0
         while integrator.successful() and integrator.t < stopTime:
             try:
-                flow[:,index] = integrator.integrate(integrator.t + self.dt)
+                flow[:,index+1] = integrator.integrate(integrator.t + self.dt)
             except:
                 print(integrator.t, stopTime)
+            integrator.integrate(integrator.t + self.dt)
             index += 1
         self.flow = flow
 
@@ -928,12 +930,14 @@ class FindParameters:
 
         #Step 6: Construct the k and h elements:
         self.hCoefs = beta[:self.lenh]
-        self.kCoefs = chi #% (2*np.pi)
+        self.kCoefs = chi 
         return beta, chi
 
 
     def func(self, t, x):
         #Unpack x
+        tol=1E-6
+        x = (x > tol) * x
         beta = x[:self.lenm]
         chi = x[-self.lenK:]
         f = np.zeros(len(self.cartan.g))

@@ -88,7 +88,7 @@ def commutatePauliString(a,tupleA,b,tupleB, comm_coefs = None, comm_table = None
     
         sites = len(tupleA)
         #builds up the result Tuple C
-        tupleC = ()
+        tupleC = ()*sites
 
         signForward = 1 # sign(a.b)
         signBackward = 1 # sign(b.a) 
@@ -97,7 +97,7 @@ def commutatePauliString(a,tupleA,b,tupleB, comm_coefs = None, comm_table = None
         #Iterate elementwise over the tuple
         for i in range(sites):
             #tupleC is the tuple represenation of the result of the commutator 
-            tupleC += (((tupleA[i] + tupleB[i]*RULES[tupleA[i]]) % 4),)
+            tupleC[i] = (((tupleA[i] + tupleB[i]*RULES[tupleA[i]]) % 4),)
             #Complex integer product of all the elementwise multiplications going forward
             signForward = signForward * SIGN_RULES[tupleA[i]][tupleB[i]]
             #Complex integer product of all the elementwise multiplications going backward
