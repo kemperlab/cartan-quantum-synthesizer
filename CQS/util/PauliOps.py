@@ -61,7 +61,7 @@ paulis = [I,X,Y,Z]
 #Allows for indexing the Pauli Arrays (Converting from tuple form (0,1,2,3) to string form IXYZ)
 
 def commutatePauliString(a,tupleA,b,tupleB, comm_coefs = None, comm_table = None):
-    """Computes the commutator of two Pauli Strings representated as a tuple
+    """Computes the commutator of two Pauli Strings represented as a tuple
     
     If a commutator table is passed, the operation is much more efficient
 
@@ -69,11 +69,11 @@ def commutatePauliString(a,tupleA,b,tupleB, comm_coefs = None, comm_table = None
         a (np.complex128): 
             The coefficient of the first Pauli String term
         tupleA (Tuple, integer): 
-            tuple represenation of the first Pauli String, or the index in the commutator table
+            tuple representation of the first Pauli String, or the index in the commutator table
         b (np.complex128): 
             The coefficient of the second Pauli String term
         tupleB (tuple, int): 
-            tuple represenation of the second Pauli String, or the index in the commutator table
+            tuple representation of the second Pauli String, or the index in the commutator table
         
     
     Returns:
@@ -95,7 +95,7 @@ def commutatePauliString(a,tupleA,b,tupleB, comm_coefs = None, comm_table = None
 
         #Iterate elementwise over the tuple
         for i in range(sites):
-            #tupleC is the tuple represenation of the result of the commutator 
+            #tupleC is the tuple representation of the result of the commutator 
             tupleC += (((tupleA[i] + tupleB[i]*RULES[tupleA[i]]) % 4),)
             #Complex integer product of all the elementwise multiplications going forward
             signForward = signForward * SIGN_RULES[tupleA[i]][tupleB[i]]
@@ -116,17 +116,17 @@ def commutatePauliString(a,tupleA,b,tupleB, comm_coefs = None, comm_table = None
     
 
 def multiplyPauliString(a,tupleA,b,tupleB):
-    """Computes the multiplication of two Pauli Strings representated as a tuple
+    """Computes the multiplication of two Pauli Strings represented as a tuple
 
     Args:
         a (np.complex128): 
             The coefficient of the first Pauli String term
         tupleA (Tuple):
-            tuple represenation of the first Pauli String
+            tuple representation of the first Pauli String
         b (np.complex128):
             The coefficient of the second Pauli String term
         tupleB (Tuple): 
-            tuple represenation of the second Pauli String
+            tuple representation of the second Pauli String
 
     Returns:
         c (np.complex128):
@@ -142,7 +142,7 @@ def multiplyPauliString(a,tupleA,b,tupleB):
     
     #Iterate elementwise over the tuple
     for i in range(sites):
-        #tupleC is the tuple represenation of the result of the commutator 
+        #tupleC is the tuple representation of the result of the commutator 
         tupleC += (((tupleA[i] + tupleB[i]*RULES[tupleA[i]]) % 4),)
         #Complex integer product of all the elementwise multiplications
         sign = sign * SIGN_RULES[tupleA[i]][tupleB[i]]
@@ -185,7 +185,7 @@ def multiplyLinComb(A,tuplesA,B,tuplesB):
 def simplifyLinComb(A,tuples):
     '''Modifies the input lists
     
-    Simplifies lin comb of Pauli matrices that it eats. Doens't return anything
+    Simplifies lin comb of Pauli matrices that it eats. Doesn't return anything
     Args:
         A: A list
         tuples: A list
