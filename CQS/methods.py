@@ -42,7 +42,7 @@ class Hamiltonian:
     def __init__(self, sites, name = None):
         """Initializes an empty Hamiltonian, unless name is specified
 
-        name is not required as an input to initialize the Hamiltonian, only the number of qubits. After intializing the Hamiltonian, users can use addModel() to add a single, imlemented Hamiltonian at a time and use .addTerms() to add lists of terms or individual terms. .removeTerm() can be used to remove a single term at a time
+        name is not required as an input to initialize the Hamiltonian, only the number of qubits. After initializing the Hamiltonian, users can use addModel() to add a single, implemented Hamiltonian at a time and use .addTerms() to add lists of terms or individual terms. .removeTerm() can be used to remove a single term at a time
 
         Args:
             qubits (int): The number of lattice points the Hamiltonian exists on
