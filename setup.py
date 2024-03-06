@@ -13,4 +13,9 @@ setup(
     version='0.2',
     license='BSD-2-Clause Plus Patent License',
     description='Implementation of the Cartan Decomposition for generating time evolution circuits on lattice spin models',
+    entry_points={
+            'qiskit.synthesis': [
+                'PauliEvolution.cartan = CQS.qiskit_plugin:CartanPlugin',
+            ],
+    },
 )
