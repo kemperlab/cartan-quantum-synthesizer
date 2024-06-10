@@ -1,5 +1,5 @@
 .vscode/
-CQS/__pycache__/
+__pycache__/
 CQS/build/
 CQS/CQS.egg-info/
 CQS/dist/
